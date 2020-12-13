@@ -31,13 +31,11 @@ public class SysUserVO {
     /**
      * 用户账号
      */
-    @Column(name = "user_name")
     private String userName;
 
     /**
      * 真实姓名
      */
-    @Column(name = "real_name")
     private String realName;
 
     /**
@@ -53,13 +51,11 @@ public class SysUserVO {
     /**
      * 公司名称
      */
-    @Column(name = "company_name")
     private String companyName;
 
     /**
      * 公司地址
      */
-    @Column(name = "company_addr")
     private String companyAddr;
 
     /**

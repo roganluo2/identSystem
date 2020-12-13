@@ -3,6 +3,7 @@ package com.sofosofi.identsystemwechat.service.impl;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
+import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.entity.SysUser;
 import com.sofosofi.identsystemwechat.entity.SysUserAccount;
@@ -13,11 +14,12 @@ import com.sofosofi.identsystemwechat.wechat.WechatResult;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +63,48 @@ public class UserServiceImpl implements IUserService {
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(user, vo);
         return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public SysUserVO userLogin(UserLoginDTO dto) {
+        SysUser sysUser = getByUserNameAndPassword(dto.getUserName(), dto.getPassword());
+        if (sysUser == null) {
+            throw new CustomException("用户名或者密码错误！");
+        }
+        WechatResult<WechatUser> result = wechatService.queryUserByCode(dto.getCode());
+        if (!result.getErrorcode().equals(Constants.SUCCESS)) {
+            throw new CustomException("code 状态异常");
+        }
+        bindOpenid(sysUser, result);
+        SysUserVO vo = new SysUserVO();
+        BeanUtils.copyProperties(sysUser, vo);
+        return vo;
+    }
+
+    /**
+     * 建立绑定关系
+     * @param sysUser
+     * @param result
+     */
+    private void bindOpenid(SysUser sysUser, WechatResult<WechatUser> result) {
+        SysUserAccount insert = new SysUserAccount();
+        insert.setAccountId(result.getData().getOpenid());
+        insert.setCreateBy(sysUser.getUserName());
+        insert.setCreateTime(new Date());
+        insert.setState(Constants.SYS_STATUS_NORMAL);
+        insert.setUpdateBy(sysUser.getUserName());
+        insert.setUpdateTime(new Date());
+        insert.setUserName(sysUser.getUserName());
+        accountMapper.insertSelective(insert);
+    }
+
+    private SysUser getByUserNameAndPassword(String userName, String password) {
+        SysUser query = new SysUser();
+        query.setStatus(Constants.SYS_STATUS_NORMAL);
+        query.setUserName(userName);
+        query.setPassword(password);
+        return sysUserMapper.selectOne(query);
     }
 
     /**

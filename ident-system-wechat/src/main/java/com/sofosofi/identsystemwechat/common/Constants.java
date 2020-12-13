@@ -10,4 +10,8 @@ public final class Constants {
      */
     public static final Integer SUCCESS = 0;
 
+    /**
+     * 系统状态正常
+     */
+    public static final String SYS_STATUS_NORMAL = "0";
 }
