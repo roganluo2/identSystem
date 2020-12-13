@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sofosofi.identsystemwechat.mapper.ProDetectMapper">
+  <resultMap id="BaseResultMap" type="com.sofosofi.identsystemwechat.entity.ProDetect">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="detect_id" jdbcType="BIGINT" property="detectId" />
+    <result column="source_type" jdbcType="VARCHAR" property="sourceType" />
+    <result column="operator_type" jdbcType="VARCHAR" property="operatorType" />
+    <result column="total_num" jdbcType="INTEGER" property="totalNum" />
+    <result column="true_num" jdbcType="INTEGER" property="trueNum" />
+    <result column="false_num" jdbcType="INTEGER" property="falseNum" />
+    <result column="detect_Info" jdbcType="VARCHAR" property="detectInfo" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+</mapper>
