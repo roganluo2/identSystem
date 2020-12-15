@@ -14,4 +14,10 @@ public final class Constants {
      * 系统状态正常
      */
     public static final String SYS_STATUS_NORMAL = "0";
+
+
+    /**
+     * 文件保存的命名空间
+     */
+    public static final String FILE_SPACE = "C:/sofosofi";
 }

@@ -3,6 +3,7 @@ package com.sofosofi.identsystemwechat.controller;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
+import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,17 @@ public class UserController {
     @PostMapping("/userLogin")
     public SofoJSONResult<SysUserVO> userLogin(@Valid @RequestBody UserLoginDTO dto) {
         SysUserVO userVO = userService.userLogin(dto);
+        return SofoJSONResult.ok(userVO);
+    }
+
+    /**
+     * 获取个人用户信息
+     * @param dto 查询条件
+     * @return
+     */
+    @PostMapping("/userInfo")
+    public SofoJSONResult<SysUserVO> userInfo(@Valid @RequestBody UserQueryDTO dto) {
+        SysUserVO userVO = userService.userInfo(dto);
         return SofoJSONResult.ok(userVO);
     }
 

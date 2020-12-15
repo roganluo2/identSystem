@@ -4,6 +4,7 @@ import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
+import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.entity.SysUser;
 import com.sofosofi.identsystemwechat.entity.SysUserAccount;
@@ -77,6 +78,15 @@ public class UserServiceImpl implements IUserService {
             throw new CustomException("code 状态异常");
         }
         bindOpenid(sysUser, result);
+        SysUserVO vo = new SysUserVO();
+        BeanUtils.copyProperties(sysUser, vo);
+        return vo;
+    }
+
+    @Override
+    public SysUserVO userInfo(UserQueryDTO dto) {
+        dto.getUserName();
+        SysUser sysUser = getUserByUserName(dto.getUserName());
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(sysUser, vo);
         return vo;

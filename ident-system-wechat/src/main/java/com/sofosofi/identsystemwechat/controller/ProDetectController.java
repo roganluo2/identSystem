@@ -1,7 +1,9 @@
 package com.sofosofi.identsystemwechat.controller;
 
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
-import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectUploadDTO;
+import com.sofosofi.identsystemwechat.common.protocol.dto.*;
+import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.entity.ProDetect;
 import com.sofosofi.identsystemwechat.mapper.ProDetectMapper;
 import com.sofosofi.identsystemwechat.service.IProDetectService;
@@ -17,21 +19,39 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/detect")
 public class ProDetectController {
 
     @Autowired
     private IProDetectService proDetectService;
 
-    @RequestMapping("/queryUserList")
-    public SofoJSONResult<List<ProDetect>> queryUserList(@RequestBody @Valid ProDetectUploadDTO dto) {
-        List<ProDetect> proDetects = proDetectService.queryUserList(dto.getUserId());
-        return SofoJSONResult.ok(proDetects);
-    }
 
     @PostMapping(value="/uploadDetect", headers="content-type=multipart/form-data")
-    public SofoJSONResult uploadDetect(String userId, MultipartFile file) throws Exception {
-     return null;
+    public SofoJSONResult<ProDetectVO> uploadDetect(@Valid @RequestBody UploadDetectDTO dto) throws Exception {
+        ProDetectVO vo = proDetectService.uploadDetect(dto);
+        return SofoJSONResult.ok(vo);
     }
 
+    /**
+     * 获取鉴真详情信息
+     * @param dto 查询条件
+     * @return
+     */
+    @PostMapping("/queryProDetectDetail")
+    public SofoJSONResult<ProDetectVO> queryProDetectDetail(@Valid @RequestBody ProDetectDetailDTO dto) {
+        ProDetectVO vo = proDetectService.queryProDetectDetail(dto);
+        return SofoJSONResult.ok(vo);
+    }
+
+    /**
+     * 获取鉴真列表，支持分页
+     * @param dto 查询条件
+     * @return
+     */
+    @PostMapping("/queryProDetectPage")
+    public SofoJSONResult<List<ProDetectVO>> queryProDetectPage(@Valid @RequestBody ProDetectQueryPageDTO dto) {
+        List<ProDetectVO> proDetectVOS = proDetectService.queryProDetectPage(dto);
+        return SofoJSONResult.ok(proDetectVOS);
+    }
 
 }
