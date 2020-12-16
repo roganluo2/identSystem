@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Builder
 @Data
@@ -15,5 +17,13 @@ public class AdviceDTO {
 
     @NotBlank(message = "用户名不能为空")
     private String userName;
+
+    @NotEmpty
+    @NotNull(message = "标题不能为空")
+    private String title;
+
+    @NotEmpty
+    @NotNull(message = "标题不能为空")
+    private String describes;
 
 }

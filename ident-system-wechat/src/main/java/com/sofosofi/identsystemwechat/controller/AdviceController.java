@@ -1,6 +1,7 @@
 package com.sofosofi.identsystemwechat.controller;
 
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
+import com.sofosofi.identsystemwechat.common.protocol.dto.AdviceDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
