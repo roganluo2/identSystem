@@ -72,4 +72,9 @@ public class SysUserVO {
      */
     private String remark;
 
+    /**
+     * 登录token,用于后续的校验
+     */
+    private String token;
+
 }

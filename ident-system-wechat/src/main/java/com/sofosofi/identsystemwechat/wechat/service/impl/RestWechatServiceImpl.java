@@ -16,7 +16,6 @@ import java.util.HashMap;
  * 通过restTemplate调用微信接口
  */
 @Service
-@ConditionalOnBean(RestTemplate.class)
 public class RestWechatServiceImpl implements IWechatService {
 
     private String CODE2SESSION_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";

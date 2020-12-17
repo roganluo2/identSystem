@@ -6,6 +6,7 @@ import com.sofosofi.identsystemwechat.mapper.SysAdviceMapper;
 import com.sofosofi.identsystemwechat.service.IAdviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
@@ -14,6 +15,7 @@ import java.util.Date;
  * @Date 2020/12/16
  * @Created by rogan.luo
  */
+@Service
 public class AdviceServiceImpl implements IAdviceService {
 
     @Autowired
