@@ -1,12 +1,16 @@
 package com.sofosofi.identsystemwechat.wechat.service.impl;
 
+import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import com.sofosofi.identsystemwechat.wechat.WechatResult;
+import com.sofosofi.identsystemwechat.wechat.enity.WechatResponse;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +20,7 @@ import java.util.HashMap;
  * 通过restTemplate调用微信接口
  */
 @Service
+@Slf4j
 public class RestWechatServiceImpl implements IWechatService {
 
     private String CODE2SESSION_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
@@ -32,14 +37,40 @@ public class RestWechatServiceImpl implements IWechatService {
     @Override
     public WechatResult<WechatUser> queryUserByCode(String code) {
         String url = String.format(CODE2SESSION_URL, wxAppId, wxAppSecret, code);
-        HashMap map = restTemplate.getForObject(url, HashMap.class);
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
+        WechatResponse response = executeRequest(url, HttpMethod.GET , requestEntity);
         WechatUser wechatUser = new WechatUser();
-        wechatUser.setOpenid((String) map.get("openid"));
-        wechatUser.setSessionKey((String) map.get("session_key"));
+        wechatUser.setOpenid(response.getOpenid());
+        wechatUser.setSessionKey(response.getSession_key());
         WechatResult<WechatUser> result = new WechatResult<>();
         result.setData(wechatUser);
-        result.setErrmsg((String) map.get("errmsg"));
-        result.setErrorcode((Integer) map.get("errcode"));
+        result.setErrmsg(response.getErrmsg());
+        result.setErrorcode(response.getErrcode());
         return result;
+    }
+
+    /**
+     * 执行接口调用，输出日志，并处理null
+     * @param url
+     * @param method
+     * @param requestEntity
+     * @return
+     */
+    private WechatResponse executeRequest(String url, HttpMethod method, HttpEntity<String> requestEntity) {
+        log.info("http request send start, url : {}, request : {}", url, JsonUtils.objectToJson(requestEntity));
+        WechatResponse response = restTemplate.exchange(url, method, requestEntity, WechatResponse.class).getBody();
+        log.info("http request send end, url : {}, request : {}, response : {}", url,
+                JsonUtils.objectToJson(requestEntity), JsonUtils.objectToJson(response));
+        if (response == null) {
+            log.info("http request error, url : {}, request : {}", url,
+                    JsonUtils.objectToJson(requestEntity));
+            WechatResponse errorResponse = new WechatResponse();
+            errorResponse.setErrcode(10000);
+            errorResponse.setErrmsg("接口调用异常!");
+            return errorResponse;
+        }
+        return response;
     }
 }
