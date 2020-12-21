@@ -2,6 +2,7 @@ package com.sofosofi.identsystemwechat.service.impl;
 
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
+import com.sofosofi.identsystemwechat.common.RedisOperator;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
@@ -15,6 +16,7 @@ import com.sofosofi.identsystemwechat.wechat.WechatResult;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -23,6 +25,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * 用户逻辑实现类
@@ -38,6 +41,9 @@ public class UserServiceImpl implements IUserService {
 
     @Resource
     private IWechatService wechatService;
+
+    @Autowired
+    private RedisOperator redis;
 
     /**
      * 1.通过code 调用微信接口，换取openid
@@ -61,9 +67,17 @@ public class UserServiceImpl implements IUserService {
             throw new CustomException(ReminderEnum.USER_NOT_EXISTS_ERROR.getCode(),
                     ReminderEnum.USER_NOT_EXISTS_ERROR.getMsg());
         }
+        String token = setUserSessionToken(user.getUserName());
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(user, vo);
+        vo.setToken(token);
         return vo;
+    }
+
+    private String setUserSessionToken(String userName) {
+        String token = UUID.randomUUID().toString();
+        redis.set(String.format(Constants.USER_REDIS_SESSION, userName), token, 24 * 3600 * 31);
+        return token;
     }
 
     @Override

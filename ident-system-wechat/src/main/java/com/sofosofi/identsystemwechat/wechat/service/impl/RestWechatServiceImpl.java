@@ -60,9 +60,10 @@ public class RestWechatServiceImpl implements IWechatService {
      */
     private WechatResponse executeRequest(String url, HttpMethod method, HttpEntity<String> requestEntity) {
         log.info("http request send start, url : {}, request : {}", url, JsonUtils.objectToJson(requestEntity));
-        WechatResponse response = restTemplate.exchange(url, method, requestEntity, WechatResponse.class).getBody();
+        String str = restTemplate.exchange(url, method, requestEntity, String.class).getBody();
         log.info("http request send end, url : {}, request : {}, response : {}", url,
-                JsonUtils.objectToJson(requestEntity), JsonUtils.objectToJson(response));
+                JsonUtils.objectToJson(requestEntity), str);
+        WechatResponse response = JsonUtils.jsonToPojo(str, WechatResponse.class);
         if (response == null) {
             log.info("http request error, url : {}, request : {}", url,
                     JsonUtils.objectToJson(requestEntity));

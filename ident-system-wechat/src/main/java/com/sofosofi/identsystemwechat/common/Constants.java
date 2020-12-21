@@ -20,4 +20,22 @@ public final class Constants {
      * 文件保存的命名空间
      */
     public static final String FILE_SPACE = "C:/sofosofi";
+
+    /**
+     * redis用户session存储  prefix:userName
+     */
+    public static final String USER_REDIS_SESSION = "user-redis-session:%s";
+
+    /**
+     * 请求头字段名- userName
+     */
+    public static final String HEADER_USER_NAME = "headerUserName";
+
+    /**
+     * 请求头字段名- token
+     */
+    public static final String HEADER_USER_TOKEN = "headerUserToken";
+
+
+
 }
