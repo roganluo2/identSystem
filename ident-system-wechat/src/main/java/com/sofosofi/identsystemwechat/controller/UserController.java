@@ -3,31 +3,27 @@ package com.sofosofi.identsystemwechat.controller;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
-import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.service.IUserService;
+import com.sofosofi.identsystemwechat.utils.SessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
     private IUserService userService;
 
     /**
-     * 根据小程序code获取用户信息
+     * 根据小程序code获取用户userName token
      * @param dto 查询条件
      * @return
      */
-    @PostMapping("/queryBindUserInfo")
+    @PostMapping(value = "/signature", produces = "application/json", consumes = "application/json")
     public SofoJSONResult<SysUserVO> queryBindUserInfo(@Valid @RequestBody UserBindQueryDTO dto) {
         SysUserVO userVO = userService.queryBindUserInfo(dto.getCode());
         return SofoJSONResult.ok(userVO);
@@ -38,7 +34,7 @@ public class UserController {
      * @param dto 查询条件
      * @return
      */
-    @PostMapping("/userLogin")
+    @PostMapping("/login")
     public SofoJSONResult<SysUserVO> userLogin(@Valid @RequestBody UserLoginDTO dto) {
         SysUserVO userVO = userService.userLogin(dto);
         return SofoJSONResult.ok(userVO);
@@ -46,12 +42,12 @@ public class UserController {
 
     /**
      * 获取个人用户信息
-     * @param dto 查询条件
      * @return
      */
-    @PostMapping("/userInfo")
-    public SofoJSONResult<SysUserVO> userInfo(@Valid @RequestBody UserQueryDTO dto) {
-        SysUserVO userVO = userService.userInfo(dto);
+    @GetMapping("/me")
+    public SofoJSONResult<SysUserVO> userInfo() {
+        String userName = SessionUtils.getUserName();
+        SysUserVO userVO = userService.userInfo(userName);
         return SofoJSONResult.ok(userVO);
     }
 

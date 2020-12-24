@@ -15,9 +15,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ProDetectQueryPageDTO {
 
-    @NotBlank(message = "用户名")
-    private String userName;
-
     @NotNull(message = "页码")
     @Min(1)
     private Integer page;

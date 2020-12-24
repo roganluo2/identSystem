@@ -5,7 +5,6 @@ import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.RedisOperator;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
-import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.entity.SysUser;
 import com.sofosofi.identsystemwechat.entity.SysUserAccount;
@@ -15,11 +14,12 @@ import com.sofosofi.identsystemwechat.service.IUserService;
 import com.sofosofi.identsystemwechat.wechat.WechatResult;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements IUserService {
     /**
      * 1.通过code 调用微信接口，换取openid
      * 2.根据openid查询db中是否有绑定的用户
-     * 3.返回绑定的用户或者跑出异常
+     * 3.返回绑定的用户或者抛出异常，引导登录
      * @param code
      * @return
      */
@@ -60,7 +60,7 @@ public class UserServiceImpl implements IUserService {
         }
         SysUserAccount account = queryAccountByOpenId(result.getData().getOpenid());
         if (account == null) {
-            throw new CustomException(ReminderEnum.NOT_BIND_ERROR.getCode(), ReminderEnum.NOT_BIND_ERROR.getMsg());
+            throw new CustomException(ReminderEnum.NOT_LOGIN_ERROR.getCode(), ReminderEnum.NOT_LOGIN_ERROR.getMsg());
         }
         SysUser user = getUserByUserName(account.getUserName());
         if (user == null) {
@@ -91,16 +91,17 @@ public class UserServiceImpl implements IUserService {
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException("code 状态异常");
         }
-        bindOpenid(sysUser, result);
+        bindOpenid(sysUser, result.getData().getOpenid());
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(sysUser, vo);
+        String token = setUserSessionToken(vo.getUserName());
+        vo.setToken(token);
         return vo;
     }
 
     @Override
-    public SysUserVO userInfo(UserQueryDTO dto) {
-        dto.getUserName();
-        SysUser sysUser = getUserByUserName(dto.getUserName());
+    public SysUserVO userInfo(String userName) {
+        SysUser sysUser = getUserByUserName(userName);
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(sysUser, vo);
         return vo;
@@ -109,25 +110,67 @@ public class UserServiceImpl implements IUserService {
     /**
      * 建立绑定关系
      * @param sysUser
-     * @param result
+     * @param openid
      */
-    private void bindOpenid(SysUser sysUser, WechatResult<WechatUser> result) {
-        SysUserAccount insert = new SysUserAccount();
-        insert.setAccountId(result.getData().getOpenid());
-        insert.setCreateBy(sysUser.getUserName());
-        insert.setCreateTime(new Date());
-        insert.setState(Constants.SYS_STATUS_NORMAL);
-        insert.setUpdateBy(sysUser.getUserName());
-        insert.setUpdateTime(new Date());
-        insert.setUserName(sysUser.getUserName());
-        accountMapper.insertSelective(insert);
+    private void bindOpenid(SysUser sysUser, String openid) {
+        SysUserAccount account = queryAccountByOpenId(openid);
+        if (account == null) {
+            insertBind(sysUser, openid);
+        } else if (!account.getUserName().equals(sysUser.getUserName())) {
+            SysUserAccount update = new SysUserAccount();
+            update.setUserAccountId(account.getUserAccountId());
+            update.setAccountId(StringUtils.EMPTY);
+            update.setUpdateBy(sysUser.getUserName());
+            update.setUpdateTime(new Date());
+            accountMapper.updateByPrimaryKeySelective(update);
+            insertBind(sysUser, openid);
+        }
     }
 
+    private void insertBind(SysUser sysUser, String openid) {
+        SysUserAccount account = queryAccountByUserNameAndOpenid(sysUser.getUserName(), StringUtils.EMPTY);
+        if (account == null) {
+            SysUserAccount insert = new SysUserAccount();
+            insert.setAccountId(openid);
+            insert.setCreateBy(sysUser.getUserName());
+            insert.setCreateTime(new Date());
+            insert.setState(Constants.SYS_STATUS_NORMAL);
+            insert.setUpdateBy(sysUser.getUserName());
+            insert.setUpdateTime(new Date());
+            insert.setUserName(sysUser.getUserName());
+            accountMapper.insertSelective(insert);
+        } else  {
+            SysUserAccount update = new SysUserAccount();
+            update.setUserAccountId(account.getUserAccountId());
+            update.setAccountId(openid);
+            update.setUpdateBy(sysUser.getUserName());
+            update.setUpdateTime(new Date());
+            accountMapper.updateByPrimaryKeySelective(update);
+        }
+    }
+
+    private SysUserAccount queryAccountByUserNameAndOpenid(String userName, String accountid) {
+        SysUserAccount query = new SysUserAccount();
+        query.setUserName(userName);
+        query.setAccountId(accountid);
+        List<SysUserAccount> list = accountMapper.select(query);
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+    /**
+     * 根据username password 获取用户信息
+     * @param userName
+     * @param password
+     * @return
+     */
     private SysUser getByUserNameAndPassword(String userName, String password) {
         SysUser query = new SysUser();
         query.setStatus(Constants.SYS_STATUS_NORMAL);
         query.setUserName(userName);
-        query.setPassword(password);
+//        query.setPassword(password);
         return sysUserMapper.selectOne(query);
     }
 
@@ -139,8 +182,7 @@ public class UserServiceImpl implements IUserService {
     private SysUser getUserByUserName(String userName) {
         SysUser sysUser = new SysUser();
         sysUser.setUserName(userName);
-        String normal = "0";
-        sysUser.setStatus(normal);
+        sysUser.setStatus(Constants.STATUS_NORMAL);
         return sysUserMapper.selectOne(sysUser);
     }
 

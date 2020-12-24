@@ -1,5 +1,7 @@
 package com.sofosofi.identsystemwechat.common.protocol;
 
+import com.sofosofi.identsystemwechat.common.ReminderEnum;
+
 /**
  * @Description: 自定义响应数据结构
  * 				这个类是提供给门户，ios，安卓，微信商城用的
@@ -30,6 +32,10 @@ public class SofoJSONResult<T> {
 
     public static SofoJSONResult errorMsg(String msg) {
         return new SofoJSONResult(DEFAULT_FAIL, msg);
+    }
+
+    public static SofoJSONResult errorToken() {
+        return new SofoJSONResult(ReminderEnum.NOT_TOKEN_ERROR.getCode(), ReminderEnum.NOT_TOKEN_ERROR.getMsg());
     }
 
     public static SofoJSONResult errorMsg(Integer status, String msg) {

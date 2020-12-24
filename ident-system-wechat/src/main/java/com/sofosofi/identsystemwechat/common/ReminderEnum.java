@@ -4,9 +4,11 @@ package com.sofosofi.identsystemwechat.common;
  * 状态码及提示信息枚举
  */
 public enum ReminderEnum {
-    NOT_BIND_ERROR(505, "您还没有绑定账号"),
+    NOT_LOGIN_ERROR(505, "您还没有登录"),
     USER_NOT_EXISTS_ERROR(506, "用户不存在或者已经锁定"),
+    NOT_TOKEN_ERROR(507, "token失效"),
     ;
+
 
     private Integer code;
 

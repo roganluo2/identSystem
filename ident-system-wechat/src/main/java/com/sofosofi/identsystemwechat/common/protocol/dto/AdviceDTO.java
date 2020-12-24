@@ -15,9 +15,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class AdviceDTO {
 
-    @NotBlank(message = "用户名不能为空")
-    private String userName;
-
     @NotEmpty
     @NotNull(message = "标题不能为空")
     private String title;

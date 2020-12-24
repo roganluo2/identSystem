@@ -36,6 +36,10 @@ public final class Constants {
      */
     public static final String HEADER_USER_TOKEN = "headerUserToken";
 
+    /**
+     * 状态正常标识
+     */
+    public static final String STATUS_NORMAL = "0";
 
 
 }

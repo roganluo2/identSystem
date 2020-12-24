@@ -12,11 +12,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadDetectDTO {
+
     @NotNull
     private MultipartFile file;
-
-    @NotEmpty
-    private String userName;
 
     /**
      * 0 - 其他 1 - 本地文件 2 - 高拍仪 3 - 扫描仪 4 - 相机

@@ -4,6 +4,7 @@ import com.sofosofi.identsystemwechat.common.protocol.dto.AdviceDTO;
 import com.sofosofi.identsystemwechat.entity.SysAdvice;
 import com.sofosofi.identsystemwechat.mapper.SysAdviceMapper;
 import com.sofosofi.identsystemwechat.service.IAdviceService;
+import com.sofosofi.identsystemwechat.utils.SessionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,15 +24,16 @@ public class AdviceServiceImpl implements IAdviceService {
 
     @Override
     public void saveAdvice(AdviceDTO dto) {
+        String userName = SessionUtils.getUserName();
         SysAdvice advice  = new SysAdvice();
         BeanUtils.copyProperties(dto, advice);
-        advice.setCreateBy(dto.getUserName());
+        advice.setCreateBy(userName);
         Date now = new Date();
         advice.setCreateTime(now);
         //TODO 默认加载字典值
         advice.setIsRead("N");
         advice.setOperatorType("4");
-        advice.setUpdateBy(dto.getUserName());
+        advice.setUpdateBy(userName);
         advice.setUpdateTime(now);
         adviceMapper.insertSelective(advice);
     }

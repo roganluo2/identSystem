@@ -19,14 +19,14 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/detect")
+@RequestMapping("/api")
 public class ProDetectController {
 
     @Autowired
     private IProDetectService proDetectService;
 
 
-    @PostMapping(value="/uploadDetect", headers="content-type=multipart/form-data")
+    @PostMapping(value="/upload", headers="content-type=multipart/form-data")
     public SofoJSONResult<ProDetectVO> uploadDetect(@Valid @RequestBody UploadDetectDTO dto) throws Exception {
         ProDetectVO vo = proDetectService.uploadDetect(dto);
         return SofoJSONResult.ok(vo);
@@ -37,7 +37,7 @@ public class ProDetectController {
      * @param dto 查询条件
      * @return
      */
-    @PostMapping("/queryProDetectDetail")
+    @PostMapping("/ident")
     public SofoJSONResult<ProDetectVO> queryProDetectDetail(@Valid @RequestBody ProDetectDetailDTO dto) {
         ProDetectVO vo = proDetectService.queryProDetectDetail(dto);
         return SofoJSONResult.ok(vo);
@@ -48,7 +48,7 @@ public class ProDetectController {
      * @param dto 查询条件
      * @return
      */
-    @PostMapping("/queryProDetectPage")
+    @PostMapping("/identList")
     public SofoJSONResult<List<ProDetectVO>> queryProDetectPage(@Valid @RequestBody ProDetectQueryPageDTO dto) {
         List<ProDetectVO> proDetectVOS = proDetectService.queryProDetectPage(dto);
         return SofoJSONResult.ok(proDetectVOS);

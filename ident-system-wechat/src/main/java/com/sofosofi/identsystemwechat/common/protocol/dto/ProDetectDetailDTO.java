@@ -20,7 +20,4 @@ public class ProDetectDetailDTO {
     @Min(1)
     private Long proDetectId;
 
-    @NotEmpty
-    private String userName;
-
 }

@@ -6,6 +6,7 @@ import com.sofosofi.identsystemwechat.wechat.enity.WechatResponse;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * 通过restTemplate调用微信接口
@@ -47,7 +49,7 @@ public class RestWechatServiceImpl implements IWechatService {
         WechatResult<WechatUser> result = new WechatResult<>();
         result.setData(wechatUser);
         result.setErrmsg(response.getErrmsg());
-        result.setErrorcode(response.getErrcode());
+        result.setErrorcode(Optional.ofNullable(response.getErrcode()).orElse(response.getErrcode()));
         return result;
     }
 
@@ -61,11 +63,11 @@ public class RestWechatServiceImpl implements IWechatService {
     private WechatResponse executeRequest(String url, HttpMethod method, HttpEntity<String> requestEntity) {
         log.info("http request send start, url : {}, request : {}", url, JsonUtils.objectToJson(requestEntity));
         String str = restTemplate.exchange(url, method, requestEntity, String.class).getBody();
-        log.info("http request send end, url : {}, request : {}, response : {}", url,
+        log.info("http request send end, url : {}, request : {}, res : {}", url,
                 JsonUtils.objectToJson(requestEntity), str);
         WechatResponse response = JsonUtils.jsonToPojo(str, WechatResponse.class);
         if (response == null) {
-            log.info("http request error, url : {}, request : {}", url,
+            log.error("http request error, url : {}, request : {}", url,
                     JsonUtils.objectToJson(requestEntity));
             WechatResponse errorResponse = new WechatResponse();
             errorResponse.setErrcode(10000);

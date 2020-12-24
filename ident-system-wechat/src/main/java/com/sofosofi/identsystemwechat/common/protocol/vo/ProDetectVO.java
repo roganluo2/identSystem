@@ -18,7 +18,7 @@ public class ProDetectVO {
     /**
      * 鉴真结果，0 篡改文件 1 真实文件 2 复印文件
      */
-    private Integer resultCode;
+        private Integer resultCode;
 
     /**
      * 创建者
@@ -33,7 +33,7 @@ public class ProDetectVO {
     /**
      * 文件路径
      */
-    private String fileUrl;
+    private String imageUrl;
 
     /**
      * 文件名

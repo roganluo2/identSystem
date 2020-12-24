@@ -1,7 +1,6 @@
 package com.sofosofi.identsystemwechat.service;
 
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
-import com.sofosofi.identsystemwechat.common.protocol.dto.UserQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 
 /**
@@ -25,8 +24,8 @@ public interface IUserService {
 
     /**
      * 根据用户名查询用户信息
-     * @param dto
+     * @param userName
      * @return
      */
-    SysUserVO userInfo(UserQueryDTO dto);
+    SysUserVO userInfo(String userName);
 }
