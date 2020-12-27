@@ -15,4 +15,6 @@ public interface IWechatService {
      */
     WechatResult<WechatUser> queryUserByCode(String code);
 
+    WechatResult<WechatUser> queryUserByCodeMock(String code);
+
 }

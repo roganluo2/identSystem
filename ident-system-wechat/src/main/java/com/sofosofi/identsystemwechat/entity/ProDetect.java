@@ -10,6 +10,7 @@ public class ProDetect {
      */
     @Id
     @Column(name = "detect_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long detectId;
 
     /**

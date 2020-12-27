@@ -17,11 +17,6 @@ public final class Constants {
 
 
     /**
-     * 文件保存的命名空间
-     */
-    public static final String FILE_SPACE = "C:/sofosofi";
-
-    /**
      * redis用户session存储  prefix:userName
      */
     public static final String USER_REDIS_SESSION = "user-redis-session:%s";
@@ -41,5 +36,20 @@ public final class Constants {
      */
     public static final String STATUS_NORMAL = "0";
 
+
+    /**
+     * 标记未读状态
+     */
+    public static final String NOT_READ = "N";
+
+    /**
+     * 标记终端，微信小程序
+     */
+    public static final String WECHAT_OPERATION_TYPE = "3";
+
+    /**
+     * 默认鉴真结果
+     */
+    public static final String DEFAULT_RESULT_CODE = "-1";
 
 }

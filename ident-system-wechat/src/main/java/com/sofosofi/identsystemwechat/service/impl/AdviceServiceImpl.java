@@ -1,5 +1,6 @@
 package com.sofosofi.identsystemwechat.service.impl;
 
+import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.protocol.dto.AdviceDTO;
 import com.sofosofi.identsystemwechat.entity.SysAdvice;
 import com.sofosofi.identsystemwechat.mapper.SysAdviceMapper;
@@ -30,9 +31,8 @@ public class AdviceServiceImpl implements IAdviceService {
         advice.setCreateBy(userName);
         Date now = new Date();
         advice.setCreateTime(now);
-        //TODO 默认加载字典值
-        advice.setIsRead("N");
-        advice.setOperatorType("4");
+        advice.setIsRead(Constants.NOT_READ);
+        advice.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
         advice.setUpdateBy(userName);
         advice.setUpdateTime(now);
         adviceMapper.insertSelective(advice);

@@ -6,12 +6,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadDetectDTO {
+public class UploadDetectDTO implements Serializable {
 
     @NotNull
     private MultipartFile file;

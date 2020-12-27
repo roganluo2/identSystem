@@ -8,12 +8,14 @@ import com.sofosofi.identsystemwechat.utils.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -30,8 +32,8 @@ public class MiniInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object arg2) throws Exception {
-		String userName = request.getHeader("headerUserName");
-		String userToken = request.getHeader("headerUserToken");
+		String userName = request.getHeader(Constants.HEADER_USER_NAME);
+		String userToken = request.getHeader(Constants.HEADER_USER_TOKEN);
 		//如果不为空，判断userName 对应的key是否和redis中的数据一致
 		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(userToken)) {
 			String uniqueToken = redis.get(String.format(Constants.USER_REDIS_SESSION, userName));
@@ -40,7 +42,7 @@ public class MiniInterceptor implements HandlerInterceptor {
 				return false;
 			} else {
 				if (!uniqueToken.equals(userToken)) {
-					log.info("账号被挤出,userName:{}, userToken:{}, uniqueToken:{}", userName, userToken, uniqueToken);
+					log.info("token 有误！,userName:{}, userToken:{}, uniqueToken:{}", userName, userToken, uniqueToken);
 					returnErrorResponse(response, SofoJSONResult.errorToken());
 					return false;
 				}
@@ -59,7 +61,7 @@ public class MiniInterceptor implements HandlerInterceptor {
 		OutputStream out=null;
 		try{
 		    response.setCharacterEncoding("utf-8");
-		    response.setContentType("text/json");
+		    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		    out = response.getOutputStream();
 		    out.write(JsonUtils.objectToJson(result).getBytes("utf-8"));
 		    out.flush();

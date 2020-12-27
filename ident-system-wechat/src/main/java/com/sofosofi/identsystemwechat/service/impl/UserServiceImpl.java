@@ -18,6 +18,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +55,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public SysUserVO queryBindUserInfo(String code) {
-        WechatResult<WechatUser> result = wechatService.queryUserByCode(code);
+        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(code);
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException(result.getErrmsg());
         }
@@ -83,11 +84,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysUserVO userLogin(UserLoginDTO dto) {
-        SysUser sysUser = getByUserNameAndPassword(dto.getUserName(), dto.getPassword());
+        SysUser sysUser = checkUserNameAndPassword(dto.getUserName(), dto.getPassword());
         if (sysUser == null) {
             throw new CustomException("用户名或者密码错误！");
         }
-        WechatResult<WechatUser> result = wechatService.queryUserByCode(dto.getCode());
+        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(dto.getCode());
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException("code 状态异常");
         }
@@ -166,11 +167,32 @@ public class UserServiceImpl implements IUserService {
      * @param password
      * @return
      */
-    private SysUser getByUserNameAndPassword(String userName, String password) {
+    private SysUser checkUserNameAndPassword(String userName, String password) {
+        SysUser sysUser = queryByUserName(userName);
+        if (sysUser == null) {
+            return sysUser;
+        }
+        if (!matches(password, sysUser.getPassword())) {
+            return null;
+        }
+        return sysUser;
+    }
+
+    /**
+     * 校验密码是否一致
+     * @param rawPassword 明文密码
+     * @param encodePassword 密文密码
+     * @return 返回值 true 代表匹配， false 代表不匹配
+     */
+    private boolean matches(String rawPassword, String encodePassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(rawPassword, encodePassword);
+    }
+
+    private SysUser queryByUserName(String userName) {
         SysUser query = new SysUser();
         query.setStatus(Constants.SYS_STATUS_NORMAL);
         query.setUserName(userName);
-//        query.setPassword(password);
         return sysUserMapper.selectOne(query);
     }
 

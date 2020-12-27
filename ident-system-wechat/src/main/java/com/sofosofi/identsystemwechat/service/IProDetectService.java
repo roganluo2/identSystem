@@ -13,13 +13,6 @@ import java.util.List;
 public interface IProDetectService {
 
     /**
-     * 查询用户
-     * @param userId
-     * @return
-     */
-    List<ProDetect> queryUserList(Integer userId);
-
-    /**
      * 查询鉴真记录列表，支持分页
      * @param dto
      * @return

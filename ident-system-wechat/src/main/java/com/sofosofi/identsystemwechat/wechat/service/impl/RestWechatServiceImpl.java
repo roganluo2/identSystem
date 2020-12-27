@@ -1,5 +1,7 @@
 package com.sofosofi.identsystemwechat.wechat.service.impl;
 
+import com.sofosofi.identsystemwechat.common.Constants;
+import com.sofosofi.identsystemwechat.common.config.DynamicConfig;
 import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import com.sofosofi.identsystemwechat.wechat.WechatResult;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatResponse;
@@ -27,18 +29,15 @@ public class RestWechatServiceImpl implements IWechatService {
 
     private String CODE2SESSION_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
 
-    @Value("${wechat.appid:}")
-    private String wxAppId;
-
-    @Value("${wechat.appsecret:}")
-    private String wxAppSecret;
+    @Autowired
+    private DynamicConfig dynamicConfig;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Override
     public WechatResult<WechatUser> queryUserByCode(String code) {
-        String url = String.format(CODE2SESSION_URL, wxAppId, wxAppSecret, code);
+        String url = String.format(CODE2SESSION_URL, dynamicConfig.getWxAppId(), dynamicConfig.getWxAppSecret(), code);
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
@@ -49,7 +48,22 @@ public class RestWechatServiceImpl implements IWechatService {
         WechatResult<WechatUser> result = new WechatResult<>();
         result.setData(wechatUser);
         result.setErrmsg(response.getErrmsg());
-        result.setErrorcode(Optional.ofNullable(response.getErrcode()).orElse(response.getErrcode()));
+        //微信接口，调用正常没有返回值，这里补充返回值
+        result.setErrorcode(Optional.ofNullable(response.getErrcode()).orElse(Constants.SUCCESS));
+        return result;
+    }
+
+
+    @Override
+    public WechatResult<WechatUser> queryUserByCodeMock(String code) {
+        WechatUser wechatUser = new WechatUser();
+        wechatUser.setOpenid("fdasfdasgvasgvw");
+        wechatUser.setSessionKey("fdasfdsafwawefewa");
+        WechatResult<WechatUser> result = new WechatResult<>();
+        result.setData(wechatUser);
+        result.setErrmsg("错误提示");
+        //微信接口，调用正常没有返回值，这里补充返回值
+        result.setErrorcode(Constants.SUCCESS);
         return result;
     }
 

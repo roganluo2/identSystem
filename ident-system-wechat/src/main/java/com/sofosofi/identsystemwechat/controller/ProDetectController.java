@@ -27,7 +27,7 @@ public class ProDetectController {
 
 
     @PostMapping(value="/upload", headers="content-type=multipart/form-data")
-    public SofoJSONResult<ProDetectVO> uploadDetect(@Valid @RequestBody UploadDetectDTO dto) throws Exception {
+    public SofoJSONResult<ProDetectVO> uploadDetect(@Valid UploadDetectDTO dto) throws Exception {
         ProDetectVO vo = proDetectService.uploadDetect(dto);
         return SofoJSONResult.ok(vo);
     }

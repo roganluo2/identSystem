@@ -2,6 +2,7 @@ package com.sofosofi.identsystemwechat;
 
 import net.coobird.thumbnailator.Thumbnails;
 import org.junit.Test;
+import org.omg.PortableServer.THREAD_POLICY_ID;
 
 import java.io.IOException;
 
