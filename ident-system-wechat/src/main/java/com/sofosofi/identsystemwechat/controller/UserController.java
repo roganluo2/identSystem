@@ -1,6 +1,5 @@
 package com.sofosofi.identsystemwechat.controller;
 
-import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
@@ -25,9 +24,9 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/signature", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public SofoJSONResult<SysUserVO> queryBindUserInfo(@Valid @RequestBody UserBindQueryDTO dto) {
+    public SysUserVO queryBindUserInfo(@Valid @RequestBody UserBindQueryDTO dto) {
         SysUserVO userVO = userService.queryBindUserInfo(dto.getCode());
-        return SofoJSONResult.ok(userVO);
+        return userVO;
     }
 
     /**
@@ -36,9 +35,9 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public SofoJSONResult<SysUserVO> userLogin(@Valid @RequestBody UserLoginDTO dto) {
+    public SysUserVO userLogin(@Valid @RequestBody UserLoginDTO dto) {
         SysUserVO userVO = userService.userLogin(dto);
-        return SofoJSONResult.ok(userVO);
+        return userVO;
     }
 
     /**
@@ -46,11 +45,20 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public SofoJSONResult<SysUserVO> userInfo() {
+    public SysUserVO userInfo() {
         String userName = SessionUtils.getUserName();
         SysUserVO userVO = userService.userInfo(userName);
-        return SofoJSONResult.ok(userVO);
+        return userVO;
     }
 
+    /**
+     * 登出
+     * @return
+     */
+    @GetMapping(value = "/logout")
+    public void logout(String openid) {
+        String userName = SessionUtils.getUserName();
+        userService.logout(userName, openid);
+    }
 
 }

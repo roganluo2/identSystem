@@ -1,6 +1,5 @@
 package com.sofosofi.identsystemwechat.controller;
 
-import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.AdviceDTO;
 import com.sofosofi.identsystemwechat.service.IAdviceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,8 @@ public class AdviceController {
      * @return
      */
     @PostMapping("/feedback")
-    public SofoJSONResult saveAdvice(@Valid @RequestBody AdviceDTO dto) {
+    public void saveAdvice(@Valid @RequestBody AdviceDTO dto) {
         adviceService.saveAdvice(dto);
-        return SofoJSONResult.ok(null);
     }
 
 

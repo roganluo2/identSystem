@@ -28,4 +28,10 @@ public interface IUserService {
      * @return
      */
     SysUserVO userInfo(String userName);
+
+    /**
+     * 用户登出
+     * @param userName
+     */
+    void logout(String userName, String openid);
 }

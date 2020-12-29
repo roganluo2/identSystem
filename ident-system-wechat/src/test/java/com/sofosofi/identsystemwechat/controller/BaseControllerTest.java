@@ -12,7 +12,7 @@ public class BaseControllerTest {
 
     MultiValueMap<String, String> headers = new LinkedMultiValueMap();
 
-    private String tempToken = "43bb82ae-3372-479a-8083-b5b1b7da940b";
+    private String tempToken = "04e666ab-9d4d-4f06-8863-0c8c1cebf116";
 
     private String userName = "sofosofi";
 

@@ -4,11 +4,16 @@ import com.google.common.base.Throwables;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 全局异常处理
@@ -26,18 +31,28 @@ public class GlobalExceptionHandler  {
      * @return 响应结果
      */
     @ExceptionHandler(CustomException.class)
-    public SofoJSONResult customExceptionHandler(HttpServletRequest request, CustomException e, HttpServletResponse response) {
+    public String customExceptionHandler(HttpServletRequest request, CustomException e, HttpServletResponse response) throws IOException {
         log.warn(Throwables.getStackTraceAsString(e));
         Integer status = e.getCode();
         String msg = e.getMessage();
-        return SofoJSONResult.errorMsg(status, msg);
+        response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+        response.setStatus(status);
+//        response.getOutputStream().write(msg.getBytes(StandardCharsets.UTF_8));
+//        response.getOutputStream().flush();
+        return msg;
     }
 
 
     @ExceptionHandler(Exception.class)
-    public SofoJSONResult runtimeExceptionHandler(HttpServletRequest request,Exception e, HttpServletResponse response) {
+    public String systemExceptionHandler(HttpServletRequest request,Exception e, HttpServletResponse response) throws IOException {
         log.error(Throwables.getStackTraceAsString(e));
-        return SofoJSONResult.errorMsg(e.getMessage());
+//        return SofoJSONResult.errorMsg(e.getMessage());
+        String msg = e.getMessage();
+        response.setStatus(500);
+        response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+//        response.getOutputStream().write("system error".getBytes(StandardCharsets.UTF_8));
+//        response.getOutputStream().flush();
+        return "system error";
     }
 
 

@@ -55,7 +55,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public SysUserVO queryBindUserInfo(String code) {
-        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(code);
+        WechatResult<WechatUser> result = wechatService.queryUserByCode(code);
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException(result.getErrmsg());
         }
@@ -70,8 +70,9 @@ public class UserServiceImpl implements IUserService {
         }
         String token = setUserSessionToken(user.getUserName());
         SysUserVO vo = new SysUserVO();
-        BeanUtils.copyProperties(user, vo);
+        vo.setUserName(user.getUserName());
         vo.setToken(token);
+        vo.setOpenid(result.getData().getOpenid());
         return vo;
     }
 
@@ -88,15 +89,16 @@ public class UserServiceImpl implements IUserService {
         if (sysUser == null) {
             throw new CustomException("用户名或者密码错误！");
         }
-        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(dto.getCode());
+        WechatResult<WechatUser> result = wechatService.queryUserByCode(dto.getCode());
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException("code 状态异常");
         }
         bindOpenid(sysUser, result.getData().getOpenid());
         SysUserVO vo = new SysUserVO();
-        BeanUtils.copyProperties(sysUser, vo);
+        vo.setUserName(sysUser.getUserName());
         String token = setUserSessionToken(vo.getUserName());
         vo.setToken(token);
+        vo.setOpenid(result.getData().getOpenid());
         return vo;
     }
 
@@ -106,6 +108,19 @@ public class UserServiceImpl implements IUserService {
         SysUserVO vo = new SysUserVO();
         BeanUtils.copyProperties(sysUser, vo);
         return vo;
+    }
+
+    @Override
+    public void logout(String userName, String openid) {
+        if (StringUtils.isEmpty(openid)) {
+            throw new CustomException("openid not exists");
+        }
+        SysUserAccount account = new SysUserAccount();
+        account.setUserName(userName);
+        account.setAccountId(openid);
+        accountMapper.delete(account);
+        //删除token
+        redis.del(String.format(Constants.USER_REDIS_SESSION, userName));
     }
 
     /**
