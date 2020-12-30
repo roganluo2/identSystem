@@ -2,6 +2,7 @@ package com.sofosofi.identsystemwechat.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sofosofi.identsystemwechat.common.protocol.IdentTypeEnum;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
@@ -25,6 +26,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,11 +46,10 @@ public class ProDetectControllerTest extends BaseControllerTest{
     @Test
     public void testQueryList() throws JsonProcessingException {
         String url = "/api/identList";
-        ProDetectQueryPageDTO dto = ProDetectQueryPageDTO.builder().page(1).size(2).build();
+        ProDetectQueryPageDTO dto = ProDetectQueryPageDTO.builder().identType(IdentTypeEnum.ORIGINAL.getCode()).page(1).size(2).build();
         HttpEntity<ProDetectQueryPageDTO> httpEntity = new HttpEntity<>(dto, headers);
-        SofoJSONResult result = restTemplate.postForObject(url, httpEntity, SofoJSONResult.class);
+        List result = restTemplate.postForObject(url, httpEntity, List.class);
         log.info("testQueryList,{}", new ObjectMapper().writeValueAsString(result));
-        assertThat(result.getStatus()).isEqualTo(SofoJSONResult.success().getStatus());
     }
 
     @Test

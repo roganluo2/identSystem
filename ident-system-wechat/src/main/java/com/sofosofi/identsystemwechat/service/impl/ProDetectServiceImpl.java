@@ -6,6 +6,7 @@ import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.DetectResultTypeEnum;
 import com.sofosofi.identsystemwechat.common.config.Config;
+import com.sofosofi.identsystemwechat.common.protocol.IdentTypeEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UploadDetectDTO;
@@ -54,6 +55,12 @@ public class ProDetectServiceImpl implements IProDetectService {
     @Override
     public List<ProDetectVO> queryProDetectPage(ProDetectQueryPageDTO dto) {
         ProDetect query = new ProDetect();
+        //这里应该是 > 0,但是小程序只是上传一张，默认处理成 = 1
+        if (dto.getIdentType().equals(IdentTypeEnum.ORIGINAL.getCode())) {
+            query.setTrueNum(1);
+        } else if (IdentTypeEnum.FAKED.getCode().equals(dto.getIdentType())){
+            query.setFalseNum(1);
+        }
         query.setCreateBy(SessionUtils.getUserName());
         query.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
         PageHelper.startPage(dto.getPage(), dto.getSize());

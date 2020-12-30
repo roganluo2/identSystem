@@ -23,4 +23,10 @@ public class ProDetectQueryPageDTO {
     @Min(1)
     private Integer size;
 
+    /**
+     * 鉴真结果类型 0 所有 1 原始 2 篡改
+     */
+    @NotNull
+    private Integer identType;
+
 }
