@@ -21,7 +21,7 @@ public class UploadDetectDTO implements Serializable {
      * 0 - 其他 1 - 本地文件 2 - 高拍仪 3 - 扫描仪 4 - 相机
      */
     @NonNull
-    @Min(1)
+    @Min(0)
     private String sourceType;
 
 }

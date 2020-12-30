@@ -4,8 +4,8 @@ package com.sofosofi.identsystemwechat.common;
  * 检测结果枚举
  */
 public enum DetectResultTypeEnum {
-    FALSE_FLAG("1", "篡改文件"),
-    TRUE_FLAG("2", "原始文件"),
+    FALSE_FLAG("0", "篡改文件"),
+    TRUE_FLAG("1", "原始文件"),
     ;
 
     DetectResultTypeEnum(String retValue, String label) {

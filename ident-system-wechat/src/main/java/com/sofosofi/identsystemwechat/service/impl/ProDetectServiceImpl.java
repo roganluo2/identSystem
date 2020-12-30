@@ -10,6 +10,7 @@ import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UploadDetectDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.StatisticsVO;
 import com.sofosofi.identsystemwechat.entity.DetectDetail;
 import com.sofosofi.identsystemwechat.entity.DetectInfo;
 import com.sofosofi.identsystemwechat.entity.DetectRes;
@@ -169,6 +170,20 @@ public class ProDetectServiceImpl implements IProDetectService {
         vo.setImageUrl( config.getFileBaseUrl() + finalFilePath);
         vo.setThumbnailImageUrl(config.getFileBaseUrl() + thumbRelativePath);
         return vo;
+    }
+
+    @Override
+    public StatisticsVO statistics() {
+       String userName = SessionUtils.getUserName();
+       ProDetect detect = proDetectMapper.selectSumByUserName(userName);
+       if (detect == null) {
+           return new StatisticsVO();
+       }
+       StatisticsVO vo = new StatisticsVO();
+       vo.setTotal(detect.getTotalNum());
+       vo.setOriginal(detect.getTrueNum());
+       vo.setFaked(detect.getFalseNum());
+       return vo;
     }
 
     private String saveThumb(String finalFilePath, String uploadPathDB, String fileName) throws IOException {

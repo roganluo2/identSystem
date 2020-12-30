@@ -35,6 +35,7 @@ public class MiniInterceptor implements HandlerInterceptor {
                              Object arg2) throws Exception {
 		String userName = request.getHeader(Constants.HEADER_USER_NAME);
 		String userToken = request.getHeader(Constants.HEADER_USER_TOKEN);
+		log.info("接口访问校验，userName:{}, userToken:{}", userName, userToken);
 		//如果不为空，判断userName 对应的key是否和redis中的数据一致
 		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(userToken)) {
 			String uniqueToken = redis.get(String.format(Constants.USER_REDIS_SESSION, userName));

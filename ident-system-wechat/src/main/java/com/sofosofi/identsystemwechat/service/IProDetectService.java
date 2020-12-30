@@ -4,6 +4,7 @@ import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UploadDetectDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.StatisticsVO;
 import com.sofosofi.identsystemwechat.entity.ProDetect;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,4 +32,11 @@ public interface IProDetectService {
      * @return
      */
     ProDetectVO uploadDetect(UploadDetectDTO dto) throws IOException;
+
+    /**
+     * 统计用户的鉴真记录
+     * @return
+     */
+    StatisticsVO statistics();
+
 }

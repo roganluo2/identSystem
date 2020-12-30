@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.StatisticsVO;
+import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -61,11 +64,17 @@ public class ProDetectControllerTest extends BaseControllerTest{
         //用HttpEntity封装整个请求报文
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(form, headers);
 
-        SofoJSONResult result = restTemplate.postForObject(url, httpEntity, SofoJSONResult.class);
+        ProDetectVO result = restTemplate.postForObject(url, httpEntity, ProDetectVO.class);
         log.info("testUpload,{}", JsonUtils.objectToJson(result));
-        assertThat(result.getStatus()).isEqualTo(SofoJSONResult.success().getStatus());
     }
 
 
+    @Test
+    public void testStatistics()  {
+        String url = "/api/statistics";
+        HttpEntity httpEntity = new HttpEntity<>(headers);
+        StatisticsVO result = restTemplate.exchange(url, HttpMethod.GET , httpEntity, StatisticsVO.class).getBody();
+        log.info("testStatistics,{}", JsonUtils.objectToJson(result));
+    }
 
 }
