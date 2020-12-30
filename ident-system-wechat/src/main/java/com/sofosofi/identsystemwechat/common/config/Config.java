@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 动态配置获取统一入口
+ * 配置获取统一入口
  */
 @Configuration
 @Data
-public class DynamicConfig {
+public class Config {
 
     @Value("${wechat.appid:}")
     private String wxAppId;
@@ -22,5 +22,8 @@ public class DynamicConfig {
 
     @Value("${file.base.url:}")
     private String fileBaseUrl;
+
+    @Value("${vmdetect.path}")
+    private String vmdetect;
 
 }

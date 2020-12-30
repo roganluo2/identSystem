@@ -12,13 +12,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
 	@Autowired
-	private DynamicConfig dynamicConfig;
+	private Config config;
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/**")
 				.addResourceLocations("classpath:/META-INF/resources/")
-				.addResourceLocations("file:" + dynamicConfig.getFileBasePath() + "/");
+				.addResourceLocations("file:" + config.getFileBasePath() + "/");
 	}
 
 

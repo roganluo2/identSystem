@@ -1,23 +1,18 @@
 package com.sofosofi.identsystemwechat.wechat.service.impl;
 
 import com.sofosofi.identsystemwechat.common.Constants;
-import com.sofosofi.identsystemwechat.common.config.DynamicConfig;
+import com.sofosofi.identsystemwechat.common.config.Config;
 import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import com.sofosofi.identsystemwechat.wechat.WechatResult;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatResponse;
 import com.sofosofi.identsystemwechat.wechat.enity.WechatUser;
 import com.sofosofi.identsystemwechat.wechat.service.IWechatService;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -30,14 +25,14 @@ public class RestWechatServiceImpl implements IWechatService {
     private String CODE2SESSION_URL = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
 
     @Autowired
-    private DynamicConfig dynamicConfig;
+    private Config config;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Override
     public WechatResult<WechatUser> queryUserByCode(String code) {
-        String url = String.format(CODE2SESSION_URL, dynamicConfig.getWxAppId(), dynamicConfig.getWxAppSecret(), code);
+        String url = String.format(CODE2SESSION_URL, config.getWxAppId(), config.getWxAppSecret(), code);
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);

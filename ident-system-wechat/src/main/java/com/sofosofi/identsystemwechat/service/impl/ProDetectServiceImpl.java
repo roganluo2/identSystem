@@ -1,17 +1,21 @@
 package com.sofosofi.identsystemwechat.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.google.common.base.Throwables;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
-import com.sofosofi.identsystemwechat.common.config.DynamicConfig;
+import com.sofosofi.identsystemwechat.common.DetectResultTypeEnum;
+import com.sofosofi.identsystemwechat.common.config.Config;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectDetailDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UploadDetectDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
 import com.sofosofi.identsystemwechat.entity.DetectDetail;
 import com.sofosofi.identsystemwechat.entity.DetectInfo;
+import com.sofosofi.identsystemwechat.entity.DetectRes;
 import com.sofosofi.identsystemwechat.entity.ProDetect;
 import com.sofosofi.identsystemwechat.mapper.ProDetectMapper;
+import com.sofosofi.identsystemwechat.service.IDetectService;
 import com.sofosofi.identsystemwechat.service.IProDetectService;
 import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import com.sofosofi.identsystemwechat.utils.SessionUtils;
@@ -21,6 +25,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,10 +42,13 @@ import java.util.*;
 public class ProDetectServiceImpl implements IProDetectService {
 
     @Autowired
-    private DynamicConfig dynamicConfig;
+    private Config config;
 
     @Resource
     private ProDetectMapper proDetectMapper;
+
+    @Resource
+    private IDetectService detectService;
 
     @Override
     public List<ProDetectVO> queryProDetectPage(ProDetectQueryPageDTO dto) {
@@ -96,7 +104,7 @@ public class ProDetectServiceImpl implements IProDetectService {
             String extension = FilenameUtils.getExtension(fileName);
             fileName = UUID.randomUUID().toString().replaceAll("-", "") + "." + extension;
             if (StringUtils.isNotBlank(fileName)) {
-                finalFilePath = dynamicConfig.getFileBasePath() + uploadRelativePath + "/" + fileName;
+                finalFilePath = config.getFileBasePath() + uploadRelativePath + "/" + fileName;
                 // 设置数据库保存的路径
 
                 File outFile = new File(finalFilePath);
@@ -121,20 +129,28 @@ public class ProDetectServiceImpl implements IProDetectService {
             }
         }
 
-        // TODO 处理图片鉴真
+        DetectRes detectRes = null;
+        try {
+            detectRes = detectService.detect(finalFilePath);
+        } catch (Exception e) {
+            log.error("鉴真检测异常：finalFilePath:{}, e:{}", finalFilePath, Throwables.getStackTraceAsString(e));
+        }
 
         //写入数据库中,此时没有鉴真数据，写入默认数据
         ProDetect detect = new ProDetect();
         detect.setSourceType(dto.getSourceType());
         detect.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
         detect.setTotalNum(1);
-        detect.setTrueNum(0);
-        detect.setFalseNum(0);
+        String code = Optional.ofNullable(detectRes).map(DetectRes::getRetValue).orElse(Constants.DEFAULT_RESULT_CODE);
+        String retMsg = Optional.ofNullable(detectRes).map(DetectRes::getRetDesc).orElse(StringUtils.EMPTY);
+        detect.setTrueNum(DetectResultTypeEnum.TRUE_FLAG.getRetValue().equals(code) ? 1 : 0);
+        detect.setFalseNum(DetectResultTypeEnum.FALSE_FLAG.getRetValue().equals(code) ? 1 : 0);
         DetectDetail detectDetail = new DetectDetail();
         //数据库中存储绝对路径
-        detectDetail.setFilePath(dynamicConfig.getFileBasePath() + uploadRelativePath);
-        detectDetail.setThumbnailPath(dynamicConfig.getFileBasePath() + thumbRelativePath);
-        detectDetail.setResultCode(Constants.DEFAULT_RESULT_CODE);
+        detectDetail.setFilePath(config.getFileBasePath() + uploadRelativePath);
+        detectDetail.setThumbnailPath(config.getFileBasePath() + thumbRelativePath);
+        detectDetail.setResultCode(code);
+        detectDetail.setResultMsg(retMsg);
         List<DetectDetail> list = Collections.singletonList(detectDetail);
         DetectInfo detectInfo = DetectInfo.builder().all(list).build();
         detect.setDetectInfo(JsonUtils.objectToJson(detectInfo));
@@ -148,15 +164,15 @@ public class ProDetectServiceImpl implements IProDetectService {
         ProDetectVO vo = new ProDetectVO();
         vo.setDetectId(detect.getDetectId());
         vo.setFilename(FilenameUtils.getName(finalFilePath));
-        vo.setResultCode(Constants.DEFAULT_RESULT_CODE);
+        vo.setResultCode(code);
         vo.setCreateTimeStr(formatDate(now));
-        vo.setImageUrl( dynamicConfig.getFileBaseUrl() + finalFilePath);
-        vo.setThumbnailImageUrl(dynamicConfig.getFileBaseUrl() + thumbRelativePath);
+        vo.setImageUrl( config.getFileBaseUrl() + finalFilePath);
+        vo.setThumbnailImageUrl(config.getFileBaseUrl() + thumbRelativePath);
         return vo;
     }
 
     private String saveThumb(String finalFilePath, String uploadPathDB, String fileName) throws IOException {
-        String thumbFilePath = dynamicConfig.getFileBasePath() + uploadPathDB + "/thumb/" + fileName;
+        String thumbFilePath = config.getFileBasePath() + uploadPathDB + "/thumb/" + fileName;
         File outFile = new File(thumbFilePath);
         if (outFile.getParentFile() != null || !outFile.getParentFile().isDirectory()) {
             outFile.getParentFile().mkdirs();
@@ -200,6 +216,6 @@ public class ProDetectServiceImpl implements IProDetectService {
         if (StringUtils.isEmpty(filePath)) {
             return StringUtils.EMPTY;
         }
-        return filePath.replace(dynamicConfig.getFileBasePath(), dynamicConfig.getFileBaseUrl());
+        return filePath.replace(config.getFileBasePath(), config.getFileBaseUrl());
     }
 }
