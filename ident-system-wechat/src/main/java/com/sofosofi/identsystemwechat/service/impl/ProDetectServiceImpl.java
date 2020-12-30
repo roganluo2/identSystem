@@ -65,7 +65,7 @@ public class ProDetectServiceImpl implements IProDetectService {
     @Override
     public ProDetectVO queryProDetectDetail(ProDetectDetailDTO dto) {
         ProDetect query = new ProDetect();
-        query.setDetectId(dto.getProDetectId());
+        query.setDetectId(dto.getDetectId());
         query.setCreateBy(SessionUtils.getUserName());
         //只是查询小程序的，其他的查询了也展示不了
         query.setOperatorType(Constants.WECHAT_OPERATION_TYPE);

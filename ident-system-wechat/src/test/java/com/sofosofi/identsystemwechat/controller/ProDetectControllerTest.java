@@ -77,4 +77,14 @@ public class ProDetectControllerTest extends BaseControllerTest{
         log.info("testStatistics,{}", JsonUtils.objectToJson(result));
     }
 
+
+    @Test
+    public void testIdent() throws JsonProcessingException {
+        String url = "/api/ident";
+        ProDetectDetailDTO dto = ProDetectDetailDTO.builder().detectId(33L).build();
+        HttpEntity<ProDetectDetailDTO> httpEntity = new HttpEntity<>(dto, headers);
+        ProDetectVO result = restTemplate.postForObject(url, httpEntity, ProDetectVO.class);
+        log.info("testIdent,{}", new ObjectMapper().writeValueAsString(result));
+    }
+
 }

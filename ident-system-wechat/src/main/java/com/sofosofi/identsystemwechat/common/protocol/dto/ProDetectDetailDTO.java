@@ -18,6 +18,6 @@ public class ProDetectDetailDTO {
 
     @NotNull
     @Min(1)
-    private Long proDetectId;
+    private Long detectId;
 
 }
