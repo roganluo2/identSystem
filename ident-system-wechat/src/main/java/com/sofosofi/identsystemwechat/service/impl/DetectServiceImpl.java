@@ -66,7 +66,7 @@ public class DetectServiceImpl implements IDetectService {
             errorStream.close();
         }
         FastIni fastIni = new FastIni();
-        DetectRes detectRes = fastIni.fromPath(path, DetectRes.class);;
+        DetectRes detectRes = fastIni.fromPath(outFilePath, DetectRes.class);;
         return detectRes;
     }
 }

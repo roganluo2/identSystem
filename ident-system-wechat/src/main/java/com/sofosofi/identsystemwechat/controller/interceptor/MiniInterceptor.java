@@ -2,6 +2,7 @@ package com.sofosofi.identsystemwechat.controller.interceptor;
 
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.RedisOperator;
+import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.SofoJSONResult;
 import com.sofosofi.identsystemwechat.utils.JsonUtils;
 import com.sofosofi.identsystemwechat.utils.SessionUtils;
@@ -38,17 +39,17 @@ public class MiniInterceptor implements HandlerInterceptor {
 		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(userToken)) {
 			String uniqueToken = redis.get(String.format(Constants.USER_REDIS_SESSION, userName));
 			if (StringUtils.isEmpty(uniqueToken)) {
-				returnErrorResponse(response, SofoJSONResult.errorToken());
+				returnErrorResponse(response);
 				return false;
 			} else {
 				if (!uniqueToken.equals(userToken)) {
 					log.info("token 有误！,userName:{}, userToken:{}, uniqueToken:{}", userName, userToken, uniqueToken);
-					returnErrorResponse(response, SofoJSONResult.errorToken());
+					returnErrorResponse(response);
 					return false;
 				}
 			}
 		} else {
-			returnErrorResponse(response, SofoJSONResult.errorToken());
+			returnErrorResponse(response);
 			return false;
 		}
 		//校验通过，把用户信息写入threadLocal
@@ -56,14 +57,15 @@ public class MiniInterceptor implements HandlerInterceptor {
 		return true;
 	}
 	
-	public void returnErrorResponse(HttpServletResponse response, SofoJSONResult result)
+	public void returnErrorResponse(HttpServletResponse response)
 			throws IOException, UnsupportedEncodingException {
 		OutputStream out=null;
 		try{
+			response.setStatus(ReminderEnum.NOT_TOKEN_ERROR.getCode());
 		    response.setCharacterEncoding("utf-8");
 		    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		    out = response.getOutputStream();
-		    out.write(JsonUtils.objectToJson(result).getBytes("utf-8"));
+		    out.write(JsonUtils.objectToJson(ReminderEnum.NOT_TOKEN_ERROR.getMsg()).getBytes("utf-8"));
 		    out.flush();
 		} finally{
 		    if(out!=null){

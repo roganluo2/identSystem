@@ -52,7 +52,7 @@ public class ProDetectControllerTest extends BaseControllerTest{
         this.headers.set("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
         final String filePath = "/Users/tanni/Desktop/rogan/pic";
         final String fileName = "1366c8ee9af1d870eac6aade3e3308c9.jpeg";
-        String url = "/api/upload";
+        String url = "http://120.79.226.150:8080/api/upload";
         //设置请求体，注意是LinkedMultiValueMap
         FileSystemResource fileSystemResource = new FileSystemResource(filePath+"/"+fileName);
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
