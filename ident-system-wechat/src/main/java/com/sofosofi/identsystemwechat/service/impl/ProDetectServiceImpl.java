@@ -12,10 +12,7 @@ import com.sofosofi.identsystemwechat.common.protocol.dto.ProDetectQueryPageDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UploadDetectDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.StatisticsVO;
-import com.sofosofi.identsystemwechat.entity.DetectDetail;
-import com.sofosofi.identsystemwechat.entity.DetectInfo;
-import com.sofosofi.identsystemwechat.entity.DetectRes;
-import com.sofosofi.identsystemwechat.entity.ProDetect;
+import com.sofosofi.identsystemwechat.entity.*;
 import com.sofosofi.identsystemwechat.mapper.ProDetectMapper;
 import com.sofosofi.identsystemwechat.service.IDetectService;
 import com.sofosofi.identsystemwechat.service.IProDetectService;
@@ -27,16 +24,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -54,18 +52,18 @@ public class ProDetectServiceImpl implements IProDetectService {
 
     @Override
     public List<ProDetectVO> queryProDetectPage(ProDetectQueryPageDTO dto) {
-        ProDetect query = new ProDetect();
-        //这里应该是 > 0,但是小程序只是上传一张，默认处理成 = 1
+        Example example = new Example(ProDetect.class);
+        Example.Criteria criteria = example.createCriteria();
         if (dto.getIdentType().equals(IdentTypeEnum.ORIGINAL.getCode())) {
-            query.setTrueNum(1);
+            criteria.andGreaterThanOrEqualTo("trueNum", 1);
         } else if (IdentTypeEnum.FAKED.getCode().equals(dto.getIdentType())){
-            query.setFalseNum(1);
+            criteria.andGreaterThanOrEqualTo("falseNum", 1);
         }
-        query.setCreateBy(SessionUtils.getUserName());
-        query.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
+        criteria.andEqualTo("createBy", SessionUtils.getUserName());
+        criteria.andEqualTo("operatorType", Constants.WECHAT_OPERATION_TYPE);
+        example.orderBy("createTime").desc();
         PageHelper.startPage(dto.getPage(), dto.getSize());
-        List<ProDetect> proDetects =
-                proDetectMapper.select(query);
+        List<ProDetect> proDetects = proDetectMapper.selectByExample(example);
         return getMappingVOs(proDetects);
     }
 
@@ -176,6 +174,24 @@ public class ProDetectServiceImpl implements IProDetectService {
         vo.setCreateTimeStr(formatDate(now));
         vo.setImageUrl( config.getFileBaseUrl() + finalFilePath);
         vo.setThumbnailImageUrl(config.getFileBaseUrl() + thumbRelativePath);
+       /* SysOperLog log = new SysOperLog();
+        log.setTitle();
+        log.setBusinessType();
+        log.setMethod();
+        log.setRequestMethod();
+        log.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
+        log.setOperName();
+        log.setDeptName();
+        log.setOperUrl();
+        log.setOperIp();
+        log.setOperLocation();
+        log.setOperParam();
+        log.setJsonResult();
+        log.setStatus();
+        log.setErrorMsg();
+        log.setOperTime();
+        log.setUserId();
+        log.setDeptId();*/
         return vo;
     }
 
@@ -204,8 +220,7 @@ public class ProDetectServiceImpl implements IProDetectService {
     }
 
     private String formatDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-        return sdf.format(date);
+        return DateFormatUtils.format(date, "yyyy-MM-dd HH:mm:ss");
     }
 
     private List<ProDetectVO> getMappingVOs(List<ProDetect> proDetects) {

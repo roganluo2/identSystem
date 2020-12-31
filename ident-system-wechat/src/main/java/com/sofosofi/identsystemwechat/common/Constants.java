@@ -15,6 +15,11 @@ public final class Constants {
      */
     public static final String SYS_STATUS_NORMAL = "0";
 
+    /**
+     * 系统状态锁定
+     */
+    public static final String SYS_STATUS_LOCK = "1";
+
 
     /**
      * redis用户session存储  prefix:userName

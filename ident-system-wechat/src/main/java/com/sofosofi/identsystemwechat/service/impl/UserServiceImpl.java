@@ -1,11 +1,13 @@
 package com.sofosofi.identsystemwechat.service.impl;
 
+import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.RedisOperator;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
+import com.sofosofi.identsystemwechat.entity.SysLogininfor;
 import com.sofosofi.identsystemwechat.entity.SysUser;
 import com.sofosofi.identsystemwechat.entity.SysUserAccount;
 import com.sofosofi.identsystemwechat.mapper.SysUserAccountMapper;
@@ -59,7 +61,7 @@ public class UserServiceImpl implements IUserService {
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException(result.getErrmsg());
         }
-        SysUserAccount account = queryAccountByOpenId(result.getData().getOpenid());
+        SysUserAccount account = queryAccountByOpenId(result.getData().getOpenid(), Constants.SYS_STATUS_NORMAL);
         if (account == null) {
             throw new CustomException(ReminderEnum.NOT_LOGIN_ERROR.getCode(), ReminderEnum.NOT_LOGIN_ERROR.getMsg());
         }
@@ -99,6 +101,16 @@ public class UserServiceImpl implements IUserService {
         String token = setUserSessionToken(vo.getUserName());
         vo.setToken(token);
         vo.setOpenid(result.getData().getOpenid());
+        /*SysLogininfor logininfor = new SysLogininfor();
+        logininfor.setUserName(sysUser.getUserName());
+        logininfor.setIpaddr();
+        logininfor.setLoginLocation();
+        logininfor.setBrowser();
+        logininfor.setOs();
+        logininfor.setStatus();
+        logininfor.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
+        logininfor.setMsg();
+        logininfor.setLoginTime();*/
         return vo;
     }
 
@@ -115,10 +127,14 @@ public class UserServiceImpl implements IUserService {
         if (StringUtils.isEmpty(openid)) {
             throw new CustomException("openid not exists");
         }
-        SysUserAccount account = new SysUserAccount();
-        account.setUserName(userName);
-        account.setAccountId(openid);
-        accountMapper.delete(account);
+        SysUserAccount sysAccount = queryAccountByOpenIdAndName(openid, userName);
+        //操作物理删除
+        if (null != sysAccount) {
+            SysUserAccount update = new SysUserAccount();
+            update.setUserAccountId(sysAccount.getUserAccountId());
+            update.setState(Constants.SYS_STATUS_NORMAL);
+            accountMapper.updateByPrimaryKeySelective(update);
+        }
         //删除token
         redis.del(String.format(Constants.USER_REDIS_SESSION, userName));
     }
@@ -129,46 +145,35 @@ public class UserServiceImpl implements IUserService {
      * @param openid
      */
     private void bindOpenid(SysUser sysUser, String openid) {
-        SysUserAccount account = queryAccountByOpenId(openid);
+        SysUserAccount account = queryAccountByOpenIdAndName(openid, sysUser.getUserName());
         if (account == null) {
             insertBind(sysUser, openid);
-        } else if (!account.getUserName().equals(sysUser.getUserName())) {
+        } else {
             SysUserAccount update = new SysUserAccount();
             update.setUserAccountId(account.getUserAccountId());
-            update.setAccountId(StringUtils.EMPTY);
-            update.setUpdateBy(sysUser.getUserName());
+            update.setState(Constants.SYS_STATUS_NORMAL);
             update.setUpdateTime(new Date());
             accountMapper.updateByPrimaryKeySelective(update);
-            insertBind(sysUser, openid);
         }
     }
 
     private void insertBind(SysUser sysUser, String openid) {
-        SysUserAccount account = queryAccountByUserNameAndOpenid(sysUser.getUserName(), StringUtils.EMPTY);
-        if (account == null) {
-            SysUserAccount insert = new SysUserAccount();
-            insert.setAccountId(openid);
-            insert.setCreateBy(sysUser.getUserName());
-            insert.setCreateTime(new Date());
-            insert.setState(Constants.SYS_STATUS_NORMAL);
-            insert.setUpdateBy(sysUser.getUserName());
-            insert.setUpdateTime(new Date());
-            insert.setUserName(sysUser.getUserName());
-            accountMapper.insertSelective(insert);
-        } else  {
-            SysUserAccount update = new SysUserAccount();
-            update.setUserAccountId(account.getUserAccountId());
-            update.setAccountId(openid);
-            update.setUpdateBy(sysUser.getUserName());
-            update.setUpdateTime(new Date());
-            accountMapper.updateByPrimaryKeySelective(update);
-        }
+        SysUserAccount insert = new SysUserAccount();
+        insert.setAccountId(openid);
+        insert.setCreateBy(sysUser.getUserName());
+        insert.setCreateTime(new Date());
+        insert.setState(Constants.SYS_STATUS_NORMAL);
+        insert.setUpdateBy(sysUser.getUserName());
+        insert.setUpdateTime(new Date());
+        insert.setUserName(sysUser.getUserName());
+        accountMapper.insertSelective(insert);
     }
 
-    private SysUserAccount queryAccountByUserNameAndOpenid(String userName, String accountid) {
+    private SysUserAccount queryAccountByUserNameAndOpenid(String userName, String accountId) {
         SysUserAccount query = new SysUserAccount();
         query.setUserName(userName);
-        query.setAccountId(accountid);
+        query.setAccountId(accountId);
+        query.setState(Constants.SYS_STATUS_NORMAL);
         List<SysUserAccount> list = accountMapper.select(query);
         if (CollectionUtils.isEmpty(list)) {
             return null;
@@ -225,14 +230,30 @@ public class UserServiceImpl implements IUserService {
 
 
     /**
-     * 根据opneid 查询用户信息
+     * 根据opneid 和用户名 查询用户信息
      * @param openid
      * @return
      */
-    private SysUserAccount queryAccountByOpenId(String openid) {
+    private SysUserAccount queryAccountByOpenIdAndName(String openid, String userName) {
         SysUserAccount query = new SysUserAccount();
         query.setAccountId(openid);
+        query.setUserName(userName);
         List<SysUserAccount> result = accountMapper.select(query);
         return Optional.ofNullable(result).filter(e -> e.size() > 0).map(e -> e.get(e.size() - 1)).orElse(null);
     }
+
+    /**
+     * 根据openid 查询状态正常的用户
+     * @param openid
+     * @return
+     */
+    private SysUserAccount queryAccountByOpenId(String openid, String state) {
+        SysUserAccount query = new SysUserAccount();
+        query.setAccountId(openid);
+        query.setState(state);
+        List<SysUserAccount> result = accountMapper.select(query);
+        return Optional.ofNullable(result).filter(e -> e.size() > 0).map(e -> e.get(e.size() - 1)).orElse(null);
+    }
+
+
 }
