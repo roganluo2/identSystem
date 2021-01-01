@@ -1,18 +1,9 @@
 package com.sofosofi.identsystemwechat.common.aop.aspect;
 
-import com.google.common.base.Throwables;
-import com.sofosofi.identsystemwechat.common.Constants;
-import com.sofosofi.identsystemwechat.common.aop.annotation.SysLogAop;
-import com.sofosofi.identsystemwechat.common.aop.aspect.login.ErrorLoginHandler;
-import com.sofosofi.identsystemwechat.common.aop.aspect.login.LogContext;
-import com.sofosofi.identsystemwechat.common.aop.aspect.login.SuccessLoginHandler;
 import com.sofosofi.identsystemwechat.common.aop.aspect.sysoper.ErrorSysLogHandler;
 import com.sofosofi.identsystemwechat.common.aop.aspect.sysoper.SuccessSysLogHandler;
 import com.sofosofi.identsystemwechat.common.aop.aspect.sysoper.SysLogContext;
-import com.sofosofi.identsystemwechat.entity.SysOperLog;
-import com.sofosofi.identsystemwechat.mapper.SysLogininforMapper;
 import com.sofosofi.identsystemwechat.mapper.SysOperLogMapper;
-import com.sofosofi.identsystemwechat.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -20,12 +11,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.plugin2.util.SystemUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.Map;
 
 @Component
 @Aspect

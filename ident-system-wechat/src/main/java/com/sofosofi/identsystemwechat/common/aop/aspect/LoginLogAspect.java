@@ -1,18 +1,10 @@
 package com.sofosofi.identsystemwechat.common.aop.aspect;
 
-import com.google.common.base.Throwables;
-import com.sofosofi.identsystemwechat.common.Constants;
-import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.aop.aspect.login.ErrorLoginHandler;
 import com.sofosofi.identsystemwechat.common.aop.aspect.login.LogContext;
 import com.sofosofi.identsystemwechat.common.aop.aspect.login.SuccessLoginHandler;
-import com.sofosofi.identsystemwechat.entity.SysLogininfor;
 import com.sofosofi.identsystemwechat.mapper.SysLogininforMapper;
-import com.sofosofi.identsystemwechat.utils.IpAddressUtils;
-import com.sofosofi.identsystemwechat.utils.QQWryUtils;
-import com.sofosofi.identsystemwechat.utils.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.bcel.Const;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -21,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 
 @Component
 @Aspect
