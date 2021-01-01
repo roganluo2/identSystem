@@ -1,5 +1,7 @@
 package com.sofosofi.identsystemwechat.controller;
 
+import com.sofosofi.identsystemwechat.common.BusinessTypeEnum;
+import com.sofosofi.identsystemwechat.common.aop.annotation.SysLogAop;
 import com.sofosofi.identsystemwechat.common.protocol.dto.*;
 import com.sofosofi.identsystemwechat.common.protocol.vo.ProDetectVO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.StatisticsVO;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -20,7 +23,8 @@ public class ProDetectController {
 
 
     @PostMapping(value="/upload", headers="content-type=multipart/form-data")
-    public ProDetectVO uploadDetect(@Valid UploadDetectDTO dto) throws Exception {
+    @SysLogAop(title = "鉴真上传文件", businessTypeEnum = BusinessTypeEnum.ADD)
+    public ProDetectVO uploadDetect(HttpServletRequest request, @Valid UploadDetectDTO dto) throws Exception {
         ProDetectVO vo = proDetectService.uploadDetect(dto);
         return vo;
     }

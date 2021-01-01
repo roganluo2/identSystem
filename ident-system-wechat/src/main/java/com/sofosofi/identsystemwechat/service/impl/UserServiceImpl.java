@@ -101,16 +101,6 @@ public class UserServiceImpl implements IUserService {
         String token = setUserSessionToken(vo.getUserName());
         vo.setToken(token);
         vo.setOpenid(result.getData().getOpenid());
-        /*SysLogininfor logininfor = new SysLogininfor();
-        logininfor.setUserName(sysUser.getUserName());
-        logininfor.setIpaddr();
-        logininfor.setLoginLocation();
-        logininfor.setBrowser();
-        logininfor.setOs();
-        logininfor.setStatus();
-        logininfor.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
-        logininfor.setMsg();
-        logininfor.setLoginTime();*/
         return vo;
     }
 

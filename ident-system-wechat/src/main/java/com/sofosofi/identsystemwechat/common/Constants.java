@@ -16,9 +16,9 @@ public final class Constants {
     public static final String SYS_STATUS_NORMAL = "0";
 
     /**
-     * 系统状态锁定
+     * 系统状态异常
      */
-    public static final String SYS_STATUS_LOCK = "1";
+    public static final String SYS_STATUS_ERROR = "1";
 
 
     /**
@@ -57,4 +57,10 @@ public final class Constants {
      */
     public static final String DEFAULT_RESULT_CODE = "-1";
 
+    public static final String HEAD_USER_AGENT = "user-agent";
+
+    /**
+     * 获取系统版本的key
+     */
+    public static final String HEADER_OS_KEY = "system";
 }

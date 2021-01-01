@@ -52,8 +52,8 @@ public class RestWechatServiceImpl implements IWechatService {
     @Override
     public WechatResult<WechatUser> queryUserByCodeMock(String code) {
         WechatUser wechatUser = new WechatUser();
-        wechatUser.setOpenid("fdasfdasgvasgvw");
-        wechatUser.setSessionKey("fdasfdsafwawefewa");
+        wechatUser.setOpenid("oGCt35MtDhfuSivILdG9GYlIT80k");
+        wechatUser.setSessionKey("oGCt35MtDhfuSivILdG9GYlIT80k");
         WechatResult<WechatUser> result = new WechatResult<>();
         result.setData(wechatUser);
         result.setErrmsg("错误提示");

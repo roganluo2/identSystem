@@ -1,5 +1,8 @@
 package com.sofosofi.identsystemwechat.controller;
 
+import com.sofosofi.identsystemwechat.common.BusinessTypeEnum;
+import com.sofosofi.identsystemwechat.common.aop.annotation.LoginLogAop;
+import com.sofosofi.identsystemwechat.common.aop.annotation.SysLogAop;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -24,6 +28,7 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/signature", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @SysLogAop(title = "快捷登录", businessTypeEnum = BusinessTypeEnum.ADD)
     public SysUserVO queryBindUserInfo(@Valid @RequestBody UserBindQueryDTO dto) {
         SysUserVO userVO = userService.queryBindUserInfo(dto.getCode());
         return userVO;
@@ -35,7 +40,8 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public SysUserVO userLogin(@Valid @RequestBody UserLoginDTO dto) {
+    @LoginLogAop
+    public SysUserVO userLogin(HttpServletRequest request, @Valid @RequestBody UserLoginDTO dto) {
         SysUserVO userVO = userService.userLogin(dto);
         return userVO;
     }

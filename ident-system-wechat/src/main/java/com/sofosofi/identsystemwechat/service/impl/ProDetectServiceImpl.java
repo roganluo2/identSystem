@@ -174,24 +174,6 @@ public class ProDetectServiceImpl implements IProDetectService {
         vo.setCreateTimeStr(formatDate(now));
         vo.setImageUrl( config.getFileBaseUrl() + finalFilePath);
         vo.setThumbnailImageUrl(config.getFileBaseUrl() + thumbRelativePath);
-       /* SysOperLog log = new SysOperLog();
-        log.setTitle();
-        log.setBusinessType();
-        log.setMethod();
-        log.setRequestMethod();
-        log.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
-        log.setOperName();
-        log.setDeptName();
-        log.setOperUrl();
-        log.setOperIp();
-        log.setOperLocation();
-        log.setOperParam();
-        log.setJsonResult();
-        log.setStatus();
-        log.setErrorMsg();
-        log.setOperTime();
-        log.setUserId();
-        log.setDeptId();*/
         return vo;
     }
 
