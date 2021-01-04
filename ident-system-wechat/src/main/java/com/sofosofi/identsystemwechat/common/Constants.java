@@ -57,7 +57,11 @@ public final class Constants {
      */
     public static final String DEFAULT_RESULT_CODE = "-1";
 
-    public static final String HEAD_USER_AGENT = "user-agent";
+    public static final String HEAD_MODEL = "model";
+
+    public static final String HEAD_PLATFORM = "platform";
+
+    public static final String HEAD_WECHAT = "wechat";
 
     /**
      * 获取系统版本的key

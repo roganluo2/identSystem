@@ -118,11 +118,13 @@ public class UserServiceImpl implements IUserService {
             throw new CustomException("openid not exists");
         }
         SysUserAccount sysAccount = queryAccountByOpenIdAndName(openid, userName);
-        //操作物理删除
+        //操作逻辑删除
         if (null != sysAccount) {
             SysUserAccount update = new SysUserAccount();
             update.setUserAccountId(sysAccount.getUserAccountId());
-            update.setState(Constants.SYS_STATUS_NORMAL);
+            update.setState(Constants.SYS_STATUS_ERROR);
+            update.setUpdateBy(userName);
+            update.setUpdateTime(new Date());
             accountMapper.updateByPrimaryKeySelective(update);
         }
         //删除token

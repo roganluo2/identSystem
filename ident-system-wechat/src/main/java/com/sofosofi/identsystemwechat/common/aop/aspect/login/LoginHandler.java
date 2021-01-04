@@ -21,6 +21,11 @@ public abstract class LoginHandler {
     private SysLogininforMapper logininforMapper;
 
     /**
+     * 分隔符
+     */
+    private String SEMICOLON ;
+
+    /**
      * 写登录日志
      * @param logContext
      */
@@ -38,8 +43,11 @@ public abstract class LoginHandler {
         } catch (Throwable e) {
             log.error("获取location异常：ip:{}, e:{}", ip, Throwables.getStackTraceAsString(e));
         }
-        String userAgent = request.getHeader(Constants.HEAD_USER_AGENT);
-        logininfor.setBrowser(userAgent);
+        String model = request.getHeader(Constants.HEAD_MODEL);
+        String platform = request.getHeader(Constants.HEAD_PLATFORM);
+        String wechat = request.getHeader(Constants.HEAD_WECHAT);
+
+        logininfor.setBrowser(model + SEMICOLON + platform + SEMICOLON + wechat);
         logininfor.setOs(request.getHeader(Constants.HEADER_OS_KEY));
         logininfor.setLoginTime(new Date());
         logininfor.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
