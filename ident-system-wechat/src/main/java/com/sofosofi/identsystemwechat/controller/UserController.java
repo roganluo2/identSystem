@@ -28,7 +28,6 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/signature", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @SysLogAop(title = "快捷登录", businessTypeEnum = BusinessTypeEnum.ADD)
     public SysUserVO queryBindUserInfo(HttpServletRequest request, @Valid @RequestBody UserBindQueryDTO dto) {
         SysUserVO userVO = userService.queryBindUserInfo(dto.getCode());
         return userVO;

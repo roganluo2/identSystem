@@ -26,7 +26,7 @@ public abstract class LoginHandler {
     /**
      * 分隔符
      */
-    private String SEMICOLON ;
+    private String SEMICOLON = ";";
 
     /**
      * 写登录日志
