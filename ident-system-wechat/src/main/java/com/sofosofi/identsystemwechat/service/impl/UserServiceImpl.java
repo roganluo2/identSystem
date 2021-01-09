@@ -86,7 +86,7 @@ public class UserServiceImpl implements IUserService {
     @Transactional(rollbackFor = Exception.class)
     public SysUserVO userLogin(UserLoginDTO dto) {
         SysUser sysUser = loginCheck(dto.getUserName(), dto.getPassword());
-        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(dto.getCode());
+        WechatResult<WechatUser> result = wechatService.queryUserByCode(dto.getCode());
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException("code 状态异常");
         }
