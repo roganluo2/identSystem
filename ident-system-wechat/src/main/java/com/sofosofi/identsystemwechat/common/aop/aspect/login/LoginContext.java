@@ -7,9 +7,9 @@ import org.springframework.http.HttpRequest;
 import javax.servlet.http.HttpServletRequest;
 
 @Data
-public class LogContext {
+public class LoginContext {
 
-    private HttpServletRequest request;
+    private ProceedingJoinPoint pjp;
 
     private Throwable e;
 

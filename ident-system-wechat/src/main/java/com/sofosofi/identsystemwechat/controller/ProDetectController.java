@@ -24,7 +24,7 @@ public class ProDetectController {
 
     @PostMapping(value="/upload", headers="content-type=multipart/form-data")
     @SysLogAop(title = "鉴真上传文件", businessTypeEnum = BusinessTypeEnum.ADD)
-    public ProDetectVO uploadDetect(HttpServletRequest request, @Valid UploadDetectDTO dto) throws Exception {
+    public ProDetectVO uploadDetect(@Valid UploadDetectDTO dto) throws Exception {
         ProDetectVO vo = proDetectService.uploadDetect(dto);
         return vo;
     }

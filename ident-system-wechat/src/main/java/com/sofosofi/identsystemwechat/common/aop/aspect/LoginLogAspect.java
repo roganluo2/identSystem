@@ -1,7 +1,7 @@
 package com.sofosofi.identsystemwechat.common.aop.aspect;
 
 import com.sofosofi.identsystemwechat.common.aop.aspect.login.ErrorLoginHandler;
-import com.sofosofi.identsystemwechat.common.aop.aspect.login.LogContext;
+import com.sofosofi.identsystemwechat.common.aop.aspect.login.LoginContext;
 import com.sofosofi.identsystemwechat.common.aop.aspect.login.SuccessLoginHandler;
 import com.sofosofi.identsystemwechat.mapper.SysLogininforMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -30,16 +30,15 @@ public class LoginLogAspect {
 
     @Around("@annotation(com.sofosofi.identsystemwechat.common.aop.annotation.LoginLogAop)")
     public Object loginLog(ProceedingJoinPoint pjp) throws Throwable {
-        HttpServletRequest request = paramHttpServletRequest(pjp);
-        LogContext logContext = new LogContext();
-        logContext.setRequest(request);
+        LoginContext loginContext = new LoginContext();
+        loginContext.setPjp(pjp);
         try {
             Object result = pjp.proceed();
-            successLoginHandler.wireLog(logContext);
+            successLoginHandler.wireLog(loginContext);
             return result;
         } catch (Throwable e) {
-            logContext.setE(e);
-            errorLoginHandler.wireLog(logContext);
+            loginContext.setE(e);
+            errorLoginHandler.wireLog(loginContext);
             throw e;
         }
     }

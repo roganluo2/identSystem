@@ -137,7 +137,7 @@ public class ProDetectServiceImpl implements IProDetectService {
 
         DetectRes detectRes = null;
         try {
-            detectRes = detectService.detect(finalFilePath);
+            detectRes = detectService.detect(finalFilePath, dto.getFont());
         } catch (Exception e) {
             log.error("鉴真检测异常：finalFilePath:{}, e:{}", finalFilePath, Throwables.getStackTraceAsString(e));
         }
@@ -174,6 +174,7 @@ public class ProDetectServiceImpl implements IProDetectService {
         vo.setCreateTimeStr(formatDate(now));
         vo.setImageUrl( config.getFileBaseUrl() + finalFilePath);
         vo.setThumbnailImageUrl(config.getFileBaseUrl() + thumbRelativePath);
+        vo.setMsg(retMsg);
         return vo;
     }
 

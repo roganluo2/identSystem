@@ -11,6 +11,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -31,39 +34,18 @@ public class SysOperLogAspect {
 
     @Around("@annotation(com.sofosofi.identsystemwechat.common.aop.annotation.SysLogAop)")
     public Object sysOperLog(ProceedingJoinPoint pjp) throws Throwable {
-        HttpServletRequest request = paramHttpServletRequest(pjp);
-        SysLogContext context = SysLogContext.builder().request(request).build();
-        MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
-        context.setMethod(methodSignature.getMethod());
         try {
             Object result = pjp.proceed();
-            context.setResult(result);
+            SysLogContext context = SysLogContext.builder().pjp(pjp).result(result).build();
             successSysLogHandler.writeSysOperLog(context);
             return result;
         } catch (Throwable e) {
-            context.setE(e);
+            SysLogContext context = SysLogContext.builder().pjp(pjp).e(e).build();
             errorSysLogHandler.writeSysOperLog(context);
             throw e;
         }
     }
 
-    /**
-     * 获取参数中列表中的request对象
-     * @param pjp
-     * @return
-     */
-    private HttpServletRequest paramHttpServletRequest(ProceedingJoinPoint pjp) {
-        Object[] args = pjp.getArgs();
-        if (args == null) {
-            return null;
-        }
-        HttpServletRequest request = null;
-        for (Object arg : args) {
-            if (HttpServletRequest.class.isAssignableFrom(arg.getClass())) {
-                request = (HttpServletRequest) arg;
-            }
-        }
-        return request;
-    }
+
 
 }

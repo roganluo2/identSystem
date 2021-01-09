@@ -26,7 +26,7 @@ public class AdviceController {
      */
     @PostMapping("/feedback")
     @SysLogAop(title = "提交反馈", businessTypeEnum = BusinessTypeEnum.ADD)
-    public void saveAdvice(HttpServletRequest request, @Valid @RequestBody AdviceDTO dto) {
+    public void saveAdvice( @Valid @RequestBody AdviceDTO dto) {
         adviceService.saveAdvice(dto);
     }
 

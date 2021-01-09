@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadDetectDTO implements Serializable {
+public class UploadDetectDTO {
 
     @NotNull
     private MultipartFile file;
@@ -23,5 +23,8 @@ public class UploadDetectDTO implements Serializable {
     @NonNull
     @Min(0)
     private String sourceType;
+
+    @NotNull
+    private String font;
 
 }

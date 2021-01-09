@@ -62,7 +62,8 @@ public class ProDetectControllerTest extends BaseControllerTest{
         FileSystemResource fileSystemResource = new FileSystemResource(filePath+"/"+fileName);
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", fileSystemResource);
-        form.add("sourceType",1);
+        form.add("sourceType",4);
+        form.add("font", "仿宋");
         //用HttpEntity封装整个请求报文
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(form, headers);
 

@@ -30,12 +30,12 @@ public class AdviceControllerTest extends BaseControllerTest{
     private TestRestTemplate restTemplate;
 
 
-    private String tempToken = "43bb82ae-3372-479a-8083-b5b1b7da940b";
+//    private String tempToken = "43bb82ae-3372-479a-8083-b5b1b7da940b";
 
-    @Before
-    public void initHeader() {
-        this.headers.set(Constants.HEADER_USER_TOKEN, tempToken);
-    }
+//    @Before
+//    public void initHeader() {
+//        this.headers.set(Constants.HEADER_USER_TOKEN, tempToken);
+//    }
 
     @Test
     public void testApiFeedback() throws JsonProcessingException {

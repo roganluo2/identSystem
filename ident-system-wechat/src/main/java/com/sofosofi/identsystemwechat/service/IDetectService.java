@@ -9,7 +9,7 @@ public interface IDetectService {
      * @param inputFile
      * @return
      */
-    public DetectRes detect(String inputFile) throws Exception;
+    public DetectRes detect(String inputFile, String font) throws Exception;
 
 
 }

@@ -8,30 +8,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class DetectServiceImpl implements IDetectService {
 
+    @Value("${vmdetect.password:}")
+    private String detectPassword;
+
+    private String DEFAULT_FONT = "仿宋";
+
     @Autowired
     private Config config;
 
     @Override
-    public DetectRes detect(String inputFile) throws Exception{
+    public DetectRes detect(String inputFile, String font) throws Exception{
         //	vmdetect ../samples/仿宋_sysfFS/未知作业名称.png 仿宋 output.file csmm666666
         List<String> command = new ArrayList<>();
-
         command.add(config.getVmdetect());
         command.add(inputFile);
-        command.add("仿宋");
+        command.add(Optional.ofNullable(font).orElse(DEFAULT_FONT));
         String path = FilenameUtils.getFullPath(inputFile);
         String outFilePath = path + "ini/" + FilenameUtils.getBaseName(inputFile) + ".ini";
         File outFile = new File(outFilePath);
@@ -41,7 +48,7 @@ public class DetectServiceImpl implements IDetectService {
         }
         command.add(outFilePath);
 
-        command.add("csmm666666");
+        command.add(detectPassword);
         String fullCommand = StringUtils.join(command, " ");
         log.info("detect command：fullCommand:{}", fullCommand);
 

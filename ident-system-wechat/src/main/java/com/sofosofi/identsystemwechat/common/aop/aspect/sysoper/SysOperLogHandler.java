@@ -7,11 +7,10 @@ import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
 import com.sofosofi.identsystemwechat.entity.SysOperLog;
 import com.sofosofi.identsystemwechat.mapper.SysOperLogMapper;
 import com.sofosofi.identsystemwechat.service.IUserService;
-import com.sofosofi.identsystemwechat.utils.IpAddressUtils;
-import com.sofosofi.identsystemwechat.utils.JsonUtils;
-import com.sofosofi.identsystemwechat.utils.QQWryUtils;
-import com.sofosofi.identsystemwechat.utils.SessionUtils;
+import com.sofosofi.identsystemwechat.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,15 +30,18 @@ public abstract class SysOperLogHandler {
     private IUserService userService;
 
     public void writeSysOperLog(SysLogContext context) {
-        HttpServletRequest request = context.getRequest();
+        HttpServletRequest request = HttpRequestUtils.paramHttpServletRequest();
         if (request == null) {
             return;
         }
-        SysLogAop annotation = context.getMethod().getAnnotation(SysLogAop.class);
+        MethodSignature methodSignature = (MethodSignature) context.getPjp().getSignature();
+        SysLogAop annotation = methodSignature.getMethod().getAnnotation(SysLogAop.class);
         SysOperLog operLog = new SysOperLog();
         operLog.setTitle(annotation.title());
         operLog.setBusinessType(Integer.valueOf(annotation.businessTypeEnum().getType()));
-        operLog.setMethod(context.getMethod().getName());
+        String method = methodSignature.getMethod().getDeclaringClass().getName() + "." +
+                methodSignature.getMethod().getName() + "()";
+        operLog.setMethod(method);
         operLog.setRequestMethod(request.getMethod());
         operLog.setOperatorType(Integer.valueOf(Constants.WECHAT_OPERATION_TYPE));
         operLog.setOperName(SessionUtils.getUserName());
@@ -53,15 +55,21 @@ public abstract class SysOperLogHandler {
         } catch (Throwable e) {
             log.error("获取location异常：ip:{}, e:{}", ip, Throwables.getStackTraceAsString(e));
         }
-
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        operLog.setOperParam(JsonUtils.objectToJson(parameterMap));
-        operLog.setJsonResult(JsonUtils.objectToJson(context.getRequest()));
+        operLog.setOperParam(getOperParam(context, request));
+        operLog.setJsonResult(JsonUtils.objectToJson(context.getResult()));
         operLog.setOperTime(new Date());
-        customLoginfo(operLog, context);
+        customOptLoginfo(operLog, context);
         sysOperLogMapper.insertSelective(operLog);
     }
 
-    protected abstract void customLoginfo(SysOperLog operLog, SysLogContext context);
+    private String getOperParam(SysLogContext context, HttpServletRequest request) {
+        String param = JsonUtils.objectToJson(context.getPjp().getArgs());
+        if (StringUtils.isEmpty(param)) {
+            param = JsonUtils.objectToJson(request.getParameterMap());
+        }
+        return param;
+    }
+
+    protected abstract void customOptLoginfo(SysOperLog operLog, SysLogContext context);
 
 }

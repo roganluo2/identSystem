@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,12 +18,12 @@ import java.lang.reflect.Method;
 @NoArgsConstructor
 public class SysLogContext {
 
-    private HttpServletRequest request;
-
     private Throwable e;
 
-    private Method method;
+    private ProceedingJoinPoint pjp;
 
     private Object result;
+
+
 
 }

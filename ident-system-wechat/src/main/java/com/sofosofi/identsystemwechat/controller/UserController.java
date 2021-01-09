@@ -1,8 +1,6 @@
 package com.sofosofi.identsystemwechat.controller;
 
-import com.sofosofi.identsystemwechat.common.BusinessTypeEnum;
 import com.sofosofi.identsystemwechat.common.aop.annotation.LoginLogAop;
-import com.sofosofi.identsystemwechat.common.aop.annotation.SysLogAop;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserBindQueryDTO;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
@@ -40,7 +38,7 @@ public class UserController {
      */
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @LoginLogAop
-    public SysUserVO userLogin(HttpServletRequest request, @Valid @RequestBody UserLoginDTO dto) {
+    public SysUserVO userLogin( @Valid @RequestBody UserLoginDTO dto) {
         SysUserVO userVO = userService.userLogin(dto);
         return userVO;
     }

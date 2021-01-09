@@ -1,13 +1,11 @@
 package com.sofosofi.identsystemwechat.service.impl;
 
-import ch.qos.logback.classic.pattern.ClassNameOnlyAbbreviator;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.RedisOperator;
 import com.sofosofi.identsystemwechat.common.ReminderEnum;
 import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.common.protocol.vo.SysUserVO;
-import com.sofosofi.identsystemwechat.entity.SysLogininfor;
 import com.sofosofi.identsystemwechat.entity.SysUser;
 import com.sofosofi.identsystemwechat.entity.SysUserAccount;
 import com.sofosofi.identsystemwechat.mapper.SysUserAccountMapper;
@@ -87,11 +85,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysUserVO userLogin(UserLoginDTO dto) {
-        SysUser sysUser = checkUserNameAndPassword(dto.getUserName(), dto.getPassword());
-        if (sysUser == null) {
-            throw new CustomException("用户名或者密码错误！");
-        }
-        WechatResult<WechatUser> result = wechatService.queryUserByCode(dto.getCode());
+        SysUser sysUser = loginCheck(dto.getUserName(), dto.getPassword());
+        WechatResult<WechatUser> result = wechatService.queryUserByCodeMock(dto.getCode());
         if (!result.getErrorcode().equals(Constants.SUCCESS)) {
             throw new CustomException("code 状态异常");
         }
@@ -179,13 +174,13 @@ public class UserServiceImpl implements IUserService {
      * @param password
      * @return
      */
-    private SysUser checkUserNameAndPassword(String userName, String password) {
+    private SysUser loginCheck(String userName, String password) {
         SysUser sysUser = queryByUserName(userName);
         if (sysUser == null) {
-            return sysUser;
+            throw new CustomException("用户账号不存在！");
         }
         if (!matches(password, sysUser.getPassword())) {
-            return null;
+            throw new CustomException("密码错误！");
         }
         return sysUser;
     }

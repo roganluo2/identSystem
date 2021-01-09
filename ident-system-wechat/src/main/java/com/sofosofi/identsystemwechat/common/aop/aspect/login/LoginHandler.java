@@ -2,8 +2,10 @@ package com.sofosofi.identsystemwechat.common.aop.aspect.login;
 
 import com.google.common.base.Throwables;
 import com.sofosofi.identsystemwechat.common.Constants;
+import com.sofosofi.identsystemwechat.common.protocol.dto.UserLoginDTO;
 import com.sofosofi.identsystemwechat.entity.SysLogininfor;
 import com.sofosofi.identsystemwechat.mapper.SysLogininforMapper;
+import com.sofosofi.identsystemwechat.utils.HttpRequestUtils;
 import com.sofosofi.identsystemwechat.utils.IpAddressUtils;
 import com.sofosofi.identsystemwechat.utils.QQWryUtils;
 import com.sofosofi.identsystemwechat.utils.SessionUtils;
@@ -15,6 +17,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,15 +33,16 @@ public abstract class LoginHandler {
 
     /**
      * 写登录日志
-     * @param logContext
+     * @param loginContext
      */
-    public void wireLog(LogContext logContext) {
-        HttpServletRequest request = logContext.getRequest();
+    public void wireLog(LoginContext loginContext) {
+        HttpServletRequest request = HttpRequestUtils.paramHttpServletRequest();
         if (request == null) {
             return;
         }
         SysLogininfor logininfor = new SysLogininfor();
-        logininfor.setUserName(SessionUtils.getUserName());
+        UserLoginDTO dto = paramUserLogin(loginContext.getPjp());
+        logininfor.setUserName(Optional.ofNullable(dto).map(UserLoginDTO::getUserName).orElse(StringUtils.EMPTY));
         String ip = IpAddressUtils.getIpAddress(request);
         logininfor.setIpaddr(ip);
         try {
@@ -51,8 +55,22 @@ public abstract class LoginHandler {
         logininfor.setLoginTime(new Date());
         logininfor.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
         logininfor.setStatus(Constants.SYS_STATUS_NORMAL);
-        customLogininfo(logininfor, logContext);
+        customLogininfo(logininfor, loginContext);
         logininforMapper.insertSelective(logininfor);
+    }
+
+    private UserLoginDTO paramUserLogin(ProceedingJoinPoint pjp) {
+        Object[] args = pjp.getArgs();
+        if (args == null) {
+            return null;
+        }
+        UserLoginDTO dto= null;
+        for (Object arg : args) {
+            if (UserLoginDTO.class.isAssignableFrom(arg.getClass())) {
+                dto = (UserLoginDTO) arg;
+            }
+        }
+        return dto;
     }
 
     /**
@@ -75,7 +93,7 @@ public abstract class LoginHandler {
         return browser;
     }
 
-    protected abstract void customLogininfo(SysLogininfor logininfor, LogContext logContext);
+    protected abstract void customLogininfo(SysLogininfor logininfor, LoginContext loginContext);
 
 
 }

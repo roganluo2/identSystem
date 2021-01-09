@@ -45,5 +45,10 @@ public class ProDetectVO {
      */
     private String thumbnailImageUrl;
 
+    /**
+     * 错误提示
+     */
+    private String msg;
+
 
 }
