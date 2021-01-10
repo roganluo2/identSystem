@@ -1,5 +1,8 @@
 package com.sofosofi.identsystemwechat.common.protocol;
 
+/**
+ * 鉴真列表查询类型枚举
+ */
 public enum IdentTypeEnum {
     ALL(0), ORIGINAL(1), FAKED(2)
     ;

@@ -2,6 +2,7 @@ package com.sofosofi.identsystemwechat.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.DetectResultTypeEnum;
@@ -36,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -147,7 +149,8 @@ public class ProDetectServiceImpl implements IProDetectService {
         detect.setSourceType(dto.getSourceType());
         detect.setOperatorType(Constants.WECHAT_OPERATION_TYPE);
         detect.setTotalNum(1);
-        String code = Optional.ofNullable(detectRes).map(DetectRes::getRetValue).orElse(Constants.DEFAULT_RESULT_CODE);
+        String code = Optional.ofNullable(detectRes).map(DetectRes::getRetValue)
+                .filter(DetectResultTypeEnum.getCodeList()::contains).orElse(Constants.DEFAULT_RESULT_CODE);
         String retMsg = Optional.ofNullable(detectRes).map(DetectRes::getRetDesc).orElse(StringUtils.EMPTY);
         detect.setTrueNum(DetectResultTypeEnum.TRUE_FLAG.getRetValue().equals(code) ? 1 : 0);
         detect.setFalseNum(DetectResultTypeEnum.FALSE_FLAG.getRetValue().equals(code) ? 1 : 0);

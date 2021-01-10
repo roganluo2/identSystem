@@ -1,5 +1,9 @@
 package com.sofosofi.identsystemwechat.common;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * 检测结果枚举
  */
@@ -22,6 +26,11 @@ public enum DetectResultTypeEnum {
      * 鉴真标签值
      */
     private String label;
+
+    public static Set<String> getCodeList() {
+       return Arrays.stream(DetectResultTypeEnum.values()).map(DetectResultTypeEnum::getRetValue)
+               .collect(Collectors.toSet());
+    }
 
     public String getRetValue() {
         return retValue;
