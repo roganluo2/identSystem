@@ -1,5 +1,6 @@
 package com.sofosofi.identsystemwechat.service.impl;
 
+import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.config.Config;
 import com.sofosofi.identsystemwechat.entity.DetectRes;
 import com.sofosofi.identsystemwechat.service.IDetectService;
@@ -37,6 +38,10 @@ public class DetectServiceImpl implements IDetectService {
         //	vmdetect ../samples/仿宋_sysfFS/未知作业名称.png 仿宋 output.file csmm666666
         List<String> command = new ArrayList<>();
         command.add(config.getVmdetect());
+        File vmFile = new File(config.getVmdetect());
+        if (!vmFile.exists()) {
+            throw new CustomException("鉴真处理程序vmdetect不存在");
+        }
         command.add(inputFile);
         command.add(Optional.ofNullable(font).orElse(DEFAULT_FONT));
         String path = FilenameUtils.getFullPath(inputFile);
@@ -55,22 +60,24 @@ public class DetectServiceImpl implements IDetectService {
         ProcessBuilder builder = new ProcessBuilder(command);
         Process process = builder.start();
 
-        InputStream errorStream = process.getErrorStream();
-        InputStreamReader inputStreamReader = new InputStreamReader(errorStream);
-        BufferedReader br = new BufferedReader(inputStreamReader);
+        BufferedReader br = null;
+        InputStream errorStream = null;
+        InputStreamReader inputStreamReader = null;
 
-        String line = "";
-        while ( (line = br.readLine()) != null ) {
-            log.warn(line);
-        }
-        if (br != null) {
-            br.close();
-        }
-        if (inputStreamReader != null) {
-            inputStreamReader.close();
-        }
-        if (errorStream != null) {
-            errorStream.close();
+        try {
+            errorStream = process.getErrorStream();
+            inputStreamReader = new InputStreamReader(errorStream);
+            br = new BufferedReader(inputStreamReader);
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+            if (inputStreamReader != null) {
+                inputStreamReader.close();
+            }
+            if (errorStream != null) {
+                errorStream.close();
+            }
         }
         FastIni fastIni = new FastIni();
         DetectRes detectRes = fastIni.fromPath(outFilePath, DetectRes.class);;

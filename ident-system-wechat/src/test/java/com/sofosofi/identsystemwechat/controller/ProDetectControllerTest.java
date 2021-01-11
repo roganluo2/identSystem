@@ -55,8 +55,8 @@ public class ProDetectControllerTest extends BaseControllerTest{
     @Test
     public void testUpload() {
         this.headers.set("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
-        final String filePath = "/Users/tanni/Desktop/rogan/pic";
-        final String fileName = "1366c8ee9af1d870eac6aade3e3308c9.jpeg";
+        final String filePath = "C:\\Users\\1\\Desktop\\jobFiles\\鉴真\\pic";
+        final String fileName = "20201223003112.jpg";
         String url = "/api/upload";
         //设置请求体，注意是LinkedMultiValueMap
         FileSystemResource fileSystemResource = new FileSystemResource(filePath+"/"+fileName);

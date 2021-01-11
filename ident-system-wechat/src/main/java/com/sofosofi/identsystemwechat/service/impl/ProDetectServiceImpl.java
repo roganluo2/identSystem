@@ -137,10 +137,12 @@ public class ProDetectServiceImpl implements IProDetectService {
             }
         }
 
-        DetectRes detectRes = null;
+        DetectRes detectRes = new DetectRes();
         try {
             detectRes = detectService.detect(finalFilePath, dto.getFont());
         } catch (Exception e) {
+            detectRes.setRetValue(Constants.DEFAULT_RESULT_CODE);
+            detectRes.setRetDesc("鉴真处理异常，请稍后重试!");
             log.error("鉴真检测异常：finalFilePath:{}, e:{}", finalFilePath, Throwables.getStackTraceAsString(e));
         }
 
