@@ -84,6 +84,10 @@ public class DetectServiceImpl implements IDetectService {
             }
         }
         FastIni fastIni = new FastIni();
+        if (!outFile.exists()) {
+            log.error("鉴真文件ini为空：path:{}", outFilePath);
+            throw new CustomException("鉴真结果为空");
+        }
         DetectRes detectRes = fastIni.fromPath(outFilePath, DetectRes.class);;
         return detectRes;
     }
