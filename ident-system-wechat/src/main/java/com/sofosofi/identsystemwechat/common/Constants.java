@@ -67,4 +67,6 @@ public final class Constants {
      * 获取系统版本的key
      */
     public static final String HEADER_OS_KEY = "system";
+
+    public static final String UNKNOW_ERROR = "未知错误";
 }

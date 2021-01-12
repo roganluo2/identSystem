@@ -2,7 +2,6 @@ package com.sofosofi.identsystemwechat.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.sofosofi.identsystemwechat.common.Constants;
 import com.sofosofi.identsystemwechat.common.CustomException;
 import com.sofosofi.identsystemwechat.common.DetectResultTypeEnum;
@@ -26,7 +25,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
@@ -37,7 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -99,6 +96,7 @@ public class ProDetectServiceImpl implements IProDetectService {
 
     @Override
     public ProDetectVO uploadDetect(UploadDetectDTO dto) throws IOException {
+        ProDetectVO vo = new ProDetectVO();
         String userName = SessionUtils.getUserName();
         // 保存到数据库中的相对路径
         String uploadRelativePath = "/" + userName+ "/detect";
@@ -129,7 +127,9 @@ public class ProDetectServiceImpl implements IProDetectService {
             }
         } catch (Exception e) {
             log.error("文件上传出错，userName:[{}], e:[{}]", userName, e);
-            throw new CustomException("文件上传出错");
+            vo.setResultCode(Constants.DEFAULT_RESULT_CODE);
+            vo.setMsg(Constants.UNKNOW_ERROR);
+            return vo;
         } finally {
             if (fileOutputStream != null) {
                 fileOutputStream.flush();
@@ -142,7 +142,7 @@ public class ProDetectServiceImpl implements IProDetectService {
             detectRes = detectService.detect(finalFilePath, dto.getFont());
         } catch (Exception e) {
             detectRes.setRetValue(Constants.DEFAULT_RESULT_CODE);
-            detectRes.setRetDesc("鉴真处理异常，请稍后重试!");
+            detectRes.setRetDesc(Constants.UNKNOW_ERROR);
             log.error("鉴真检测异常：finalFilePath:{}, e:{}", finalFilePath, Throwables.getStackTraceAsString(e));
         }
 
@@ -172,7 +172,7 @@ public class ProDetectServiceImpl implements IProDetectService {
         detect.setUpdateTime(now);
         proDetectMapper.insertSelective(detect);
 
-        ProDetectVO vo = new ProDetectVO();
+
         vo.setCreateBy(userName);
         vo.setDetectId(detect.getDetectId());
         vo.setFilename(FilenameUtils.getName(finalFilePath));
