@@ -173,6 +173,7 @@ public class ProDetectServiceImpl implements IProDetectService {
         proDetectMapper.insertSelective(detect);
 
         ProDetectVO vo = new ProDetectVO();
+        vo.setCreateBy(userName);
         vo.setDetectId(detect.getDetectId());
         vo.setFilename(FilenameUtils.getName(finalFilePath));
         vo.setResultCode(code);

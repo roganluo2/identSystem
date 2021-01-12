@@ -68,6 +68,10 @@ public class DetectServiceImpl implements IDetectService {
             errorStream = process.getErrorStream();
             inputStreamReader = new InputStreamReader(errorStream);
             br = new BufferedReader(inputStreamReader);
+            String line = "";
+            while ( (line = br.readLine()) != null ) {
+                log.info("vmdetect line:{}", line);
+            }
         } finally {
             if (br != null) {
                 br.close();

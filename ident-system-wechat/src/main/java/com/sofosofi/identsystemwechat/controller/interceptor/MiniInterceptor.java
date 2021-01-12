@@ -31,8 +31,7 @@ public class MiniInterceptor implements HandlerInterceptor {
 	 * 拦截请求，在controller调用之前
 	 */
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                             Object arg2) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object arg2) throws Exception {
 		String userName = request.getHeader(Constants.HEADER_USER_NAME);
 		String userToken = request.getHeader(Constants.HEADER_USER_TOKEN);
 		log.info("接口访问校验，userToken:{}，userName:{}", userToken, userName);
@@ -40,6 +39,7 @@ public class MiniInterceptor implements HandlerInterceptor {
 		if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(userToken)) {
 			String uniqueToken = redis.get(String.format(Constants.USER_REDIS_SESSION, userName));
 			if (StringUtils.isEmpty(uniqueToken)) {
+				log.info("token 失效！,userName:{}, userToken:{}, uniqueToken:{}", userName, userToken, uniqueToken);
 				returnErrorResponse(response);
 				return false;
 			} else {
