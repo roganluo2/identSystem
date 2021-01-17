@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +50,8 @@ public class DetectServiceImpl implements IDetectService {
         }
         command.add(outFilePath);
 
-        command.add(detectPassword);
+        //update by tonglu
+//        command.add(detectPassword);
         String fullCommand = StringUtils.join(command, " ");
         log.info("detect command：fullCommand:{}", fullCommand);
 
@@ -66,7 +64,7 @@ public class DetectServiceImpl implements IDetectService {
 
         try {
             errorStream = process.getErrorStream();
-            inputStreamReader = new InputStreamReader(errorStream);
+            inputStreamReader = new InputStreamReader(errorStream,"gbk");
             br = new BufferedReader(inputStreamReader);
             String line = "";
             while ( (line = br.readLine()) != null ) {
@@ -88,7 +86,9 @@ public class DetectServiceImpl implements IDetectService {
             log.error("鉴真文件ini为空：path:{}", outFilePath);
             throw new CustomException("鉴真结果为空");
         }
-        DetectRes detectRes = fastIni.fromPath(outFilePath, DetectRes.class);;
+
+        DetectRes detectRes = fastIni.fromPath(outFilePath, DetectRes.class);
         return detectRes;
+
     }
 }

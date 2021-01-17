@@ -155,7 +155,12 @@ public class ProDetectServiceImpl implements IProDetectService {
                 .filter(DetectResultTypeEnum.getCodeList()::contains).orElse(Constants.DEFAULT_RESULT_CODE);
         String retMsg = Optional.ofNullable(detectRes).map(DetectRes::getRetDesc).orElse(StringUtils.EMPTY);
         detect.setTrueNum(DetectResultTypeEnum.TRUE_FLAG.getRetValue().equals(code) ? 1 : 0);
-        detect.setFalseNum(DetectResultTypeEnum.FALSE_FLAG.getRetValue().equals(code) ? 1 : 0);
+
+//        detect.setFalseNum(DetectResultTypeEnum.FALSE_FLAG.getRetValue().equals(code) ? 1 : 0);
+
+        //update by tonglu
+        detect.setFalseNum((!DetectResultTypeEnum.TRUE_FLAG.getRetValue().equals(code)) ? 1 : 0);
+
         DetectDetail detectDetail = new DetectDetail();
         //数据库中存储绝对路径
         detectDetail.setFilePath(config.getFileBasePath() + uploadRelativePath);

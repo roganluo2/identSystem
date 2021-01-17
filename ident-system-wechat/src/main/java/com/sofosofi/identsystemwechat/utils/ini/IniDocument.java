@@ -94,7 +94,11 @@ public class IniDocument {
     public IniDocument fromStream(InputStream inputStream) {
         try {
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(inputStream, "utf-8"));
+//                    new InputStreamReader(inputStream, "utf-8"));
+
+            //update by tonglu 修改读取鉴真INI结果中文乱码问题
+            new InputStreamReader(inputStream, "gbk"));
+            
             String line = null;
             while ((line = reader.readLine()) != null) {
                 srcLines.add(line);
